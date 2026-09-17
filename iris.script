@@ -1,6 +1,6 @@
 zn "USER"
 set sc=$System.OBJ.LoadDir("/home/irisowner/dev/src","ck",,1)
-if $$$ISERR(sc) write $System.Status.GetErrorText(sc),! halt 1
+if 'sc write $System.Status.GetErrorText(sc),! halt 1
 set sc=##class(IRISControlCenter.Installer).Setup()
-if $$$ISERR(sc) write $System.Status.GetErrorText(sc),! halt 1
+if 'sc write $System.Status.GetErrorText(sc),! halt 1
 halt
