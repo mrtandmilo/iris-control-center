@@ -9,6 +9,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
   <Route Url="/health" Method="GET" Call="Health" />
   <Route Url="/services" Method="GET" Call="Services" />
   <Route Url="/openapi" Method="GET" Call="OpenAPI" />
+  <Route Url="/request" Method="GET" Call="RequestGET" />
 </Routes>
 }
 
@@ -17,14 +18,26 @@ ClassMethod AuthHeader() As %String [ Private ]
     Quit %request.GetCgiEnv("HTTP_AUTHORIZATION","")
 }
 
+ClassMethod LocalPort() As %Integer [ Private ]
+{
+    Quit $Select($Get(^%SYS("WebServer","Port"))'="":$Get(^%SYS("WebServer","Port")),1:52773)
+}
+
+ClassMethod CatalogueService(service As %String, auth As %String) As %DynamicObject [ Private ]
+{
+    Set catalogue = ##class(IRISControlCenter.ServiceDiscovery).GetCatalogue(auth)
+    Set found = ""
+    Set iter = catalogue.services.%GetIterator()
+    While iter.%GetNext(.key,.item) {
+        If item.name = service Set found = item Quit
+    }
+    Quit found
+}
+
 ClassMethod Health() As %Status
 {
     Set %response.ContentType = "application/json"
-    Set body = {
-        "status":"ok",
-        "application":"IRIS Control Center",
-        "namespace":($Namespace)
-    }
+    Set body = {"status":"ok","application":"IRIS Control Center","namespace":($Namespace)}
     Write body.%ToJSON()
     Quit $$$OK
 }
@@ -48,13 +61,7 @@ ClassMethod OpenAPI() As %Status
     }
 
     Set auth = ..AuthHeader()
-    Set catalogue = ##class(IRISControlCenter.ServiceDiscovery).GetCatalogue(auth)
-    Set found = ""
-    Set iter = catalogue.services.%GetIterator()
-    While iter.%GetNext(.key,.item) {
-        If item.name = service Set found = item Quit
-    }
-
+    Set found = ..CatalogueService(service,auth)
     If '$IsObject(found) {
         Set %response.Status = "404 Not Found"
         Write {"error":"service_not_found","service":(service)}.%ToJSON()
@@ -69,7 +76,7 @@ ClassMethod OpenAPI() As %Status
     Try {
         Set request = ##class(%Net.HttpRequest).%New()
         Set request.Server = "127.0.0.1"
-        Set request.Port = $Select($Get(^%SYS("WebServer","Port"))'="":$Get(^%SYS("WebServer","Port")),1:52773)
+        Set request.Port = ..LocalPort()
         If auth'="" Do request.SetHeader("Authorization",auth)
         Set sc = request.Get(found.swagger)
         If $$$ISERR(sc) {
@@ -87,6 +94,67 @@ ClassMethod OpenAPI() As %Status
     } Catch ex {
         Set %response.Status = "502 Bad Gateway"
         Write {"error":"openapi_fetch_failed","detail":(ex.DisplayString())}.%ToJSON()
+    }
+    Quit $$$OK
+}
+
+ClassMethod RequestGET() As %Status
+{
+    Set %response.ContentType = "application/json"
+    Set service = $Get(%request.Data("service",1))
+    Set path = $Get(%request.Data("path",1))
+    If (service="")!(path="") {
+        Set %response.Status = "400 Bad Request"
+        Write {"error":"service_and_path_required"}.%ToJSON()
+        Quit $$$OK
+    }
+    If $Extract(path,1)'="/" {
+        Set %response.Status = "400 Bad Request"
+        Write {"error":"path_must_be_relative"}.%ToJSON()
+        Quit $$$OK
+    }
+    If (path["://")!(path["\\") {
+        Set %response.Status = "400 Bad Request"
+        Write {"error":"invalid_path"}.%ToJSON()
+        Quit $$$OK
+    }
+
+    Set auth = ..AuthHeader()
+    Set found = ..CatalogueService(service,auth)
+    If '$IsObject(found) {
+        Set %response.Status = "404 Not Found"
+        Write {"error":"service_not_found","service":(service)}.%ToJSON()
+        Quit $$$OK
+    }
+    Set base = found.webApplication
+    If base="" {
+        Set %response.Status = "400 Bad Request"
+        Write {"error":"service_has_no_web_application"}.%ToJSON()
+        Quit $$$OK
+    }
+    If $Extract(base,$Length(base))="/" Set base=$Extract(base,1,$Length(base)-1)
+
+    Try {
+        Set request = ##class(%Net.HttpRequest).%New()
+        Set request.Server = "127.0.0.1"
+        Set request.Port = ..LocalPort()
+        Set request.Timeout = 15
+        Do request.SetHeader("Accept","application/json")
+        If auth'="" Do request.SetHeader("Authorization",auth)
+        Set sc = request.Get(base_path)
+        If $$$ISERR(sc) {
+            Set %response.Status = "502 Bad Gateway"
+            Write {"error":"request_failed","detail":($System.Status.GetErrorText(sc))}.%ToJSON()
+            Quit $$$OK
+        }
+        Set upstream = request.HttpResponse
+        Set %response.Status = upstream.StatusCode_" "_upstream.ReasonPhrase
+        If upstream.ContentType'="" Set %response.ContentType = upstream.ContentType
+        Do upstream.Data.Rewind()
+        Write upstream.Data.Read()
+    } Catch ex {
+        Set %response.Status = "502 Bad Gateway"
+        Write {"error":"request_failed","detail":(ex.DisplayString())}.%ToJSON()
     }
     Quit $$$OK
 }
