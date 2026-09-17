@@ -8,8 +8,13 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Routes>
   <Route Url="/health" Method="GET" Call="Health" />
   <Route Url="/services" Method="GET" Call="Services" />
-  <Route Url="/openapi/:service" Method="GET" Call="OpenAPI" />
+  <Route Url="/openapi" Method="GET" Call="OpenAPI" />
 </Routes>
+}
+
+ClassMethod AuthHeader() As %String [ Private ]
+{
+    Quit %request.GetCgiEnv("HTTP_AUTHORIZATION","")
 }
 
 ClassMethod Health() As %Status
@@ -27,17 +32,24 @@ ClassMethod Health() As %Status
 ClassMethod Services() As %Status
 {
     Set %response.ContentType = "application/json"
-    Set response = ##class(IRISControlCenter.ServiceDiscovery).GetCatalogue()
+    Set response = ##class(IRISControlCenter.ServiceDiscovery).GetCatalogue(..AuthHeader())
     Write response.%ToJSON()
     Quit $$$OK
 }
 
-ClassMethod OpenAPI(service As %String) As %Status
+ClassMethod OpenAPI() As %Status
 {
     Set %response.ContentType = "application/json"
-    Set catalogue = ##class(IRISControlCenter.ServiceDiscovery).GetCatalogue()
-    Set found = ""
+    Set service = $Get(%request.Data("service",1))
+    If service="" {
+        Set %response.Status = "400 Bad Request"
+        Write {"error":"service_required"}.%ToJSON()
+        Quit $$$OK
+    }
 
+    Set auth = ..AuthHeader()
+    Set catalogue = ##class(IRISControlCenter.ServiceDiscovery).GetCatalogue(auth)
+    Set found = ""
     Set iter = catalogue.services.%GetIterator()
     While iter.%GetNext(.key,.item) {
         If item.name = service Set found = item Quit
@@ -48,7 +60,6 @@ ClassMethod OpenAPI(service As %String) As %Status
         Write {"error":"service_not_found","service":(service)}.%ToJSON()
         Quit $$$OK
     }
-
     If found.swagger = "" {
         Set %response.Status = "404 Not Found"
         Write {"error":"openapi_not_available","service":(service)}.%ToJSON()
@@ -59,10 +70,16 @@ ClassMethod OpenAPI(service As %String) As %Status
         Set request = ##class(%Net.HttpRequest).%New()
         Set request.Server = "127.0.0.1"
         Set request.Port = $Select($Get(^%SYS("WebServer","Port"))'="":$Get(^%SYS("WebServer","Port")),1:52773)
+        If auth'="" Do request.SetHeader("Authorization",auth)
         Set sc = request.Get(found.swagger)
         If $$$ISERR(sc) {
             Set %response.Status = "502 Bad Gateway"
             Write {"error":"openapi_fetch_failed","detail":($System.Status.GetErrorText(sc))}.%ToJSON()
+            Quit $$$OK
+        }
+        If request.HttpResponse.StatusCode '= 200 {
+            Set %response.Status = "502 Bad Gateway"
+            Write {"error":"openapi_fetch_failed","upstreamStatus":(request.HttpResponse.StatusCode)}.%ToJSON()
             Quit $$$OK
         }
         Do request.HttpResponse.Data.Rewind()
@@ -71,7 +88,6 @@ ClassMethod OpenAPI(service As %String) As %Status
         Set %response.Status = "502 Bad Gateway"
         Write {"error":"openapi_fetch_failed","detail":(ex.DisplayString())}.%ToJSON()
     }
-
     Quit $$$OK
 }
 
