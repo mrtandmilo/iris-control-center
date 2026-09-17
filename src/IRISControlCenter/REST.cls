@@ -34,6 +34,20 @@ ClassMethod CatalogueService(service As %String, auth As %String) As %DynamicObj
     Quit found
 }
 
+ClassMethod IsSafeRelativePath(path As %String) As %Boolean [ Private ]
+{
+    If $Extract(path,1)'="/" Quit 0
+    Set lower = $ZConvert(path,"L")
+    If (lower["://")!(lower["\\") Quit 0
+    // Keep the proxy pinned beneath the selected IRIS web application. Reject
+    // literal and percent-encoded dot segments before the upstream server gets
+    // an opportunity to normalize them.
+    Set pathname = $Piece(lower,"?",1)
+    If (pathname="/..")!(pathname["/../")!($Extract(pathname,$Length(pathname)-2,*)="/..") Quit 0
+    If (pathname["%2e%2e")!(pathname["%2e.")!(pathname[".%2e") Quit 0
+    Quit 1
+}
+
 ClassMethod Health() As %Status
 {
     Set %response.ContentType = "application/json"
@@ -108,12 +122,7 @@ ClassMethod RequestGET() As %Status
         Write {"error":"service_and_path_required"}.%ToJSON()
         Quit $$$OK
     }
-    If $Extract(path,1)'="/" {
-        Set %response.Status = "400 Bad Request"
-        Write {"error":"path_must_be_relative"}.%ToJSON()
-        Quit $$$OK
-    }
-    If (path["://")!(path["\\") {
+    If '..IsSafeRelativePath(path) {
         Set %response.Status = "400 Bad Request"
         Write {"error":"invalid_path"}.%ToJSON()
         Quit $$$OK
