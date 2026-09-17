@@ -55,9 +55,15 @@ Keeping the UI and API web applications separate makes their responsibilities an
 - The interactive workbench executes GET operations only; mutating methods remain visible for documentation but cannot be launched from the UI.
 - Request execution is restricted to the selected service's local web-application path rather than accepting an arbitrary remote host.
 
+## Validation and contest preparation
+
+- [`docs/TESTING.md`](docs/TESTING.md) defines the clean-build, API, browser and security checks that must pass before the project is described as runtime-tested.
+- [`docs/CONTEST_SUBMISSION.md`](docs/CONTEST_SUBMISSION.md) contains the evaluator-focused project summary, demo flow and final submission gate.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) tracks the remaining delivery work.
+
 ## Development status
 
-The main application flow is implemented: installation, service discovery, OpenAPI inspection and read-only request execution. Runtime validation against the target IRIS container and contest-focused testing/documentation remain in progress.
+The main application flow is implemented: installation, service discovery, OpenAPI inspection and read-only request execution. Runtime validation against the target IRIS container and contest-focused testing/documentation remain in progress. Until the runtime checklist passes, this repository deliberately does not claim that the complete flow has been validated on the target container.
 
 ## Contest
 
