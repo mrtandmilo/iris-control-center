@@ -133,6 +133,7 @@ ClassMethod RequestGET() As %Status
         Quit $$$OK
     }
     If $Extract(base,$Length(base))="/" Set base=$Extract(base,1,$Length(base)-1)
+    Set target = base_path
 
     Try {
         Set request = ##class(%Net.HttpRequest).%New()
@@ -141,7 +142,7 @@ ClassMethod RequestGET() As %Status
         Set request.Timeout = 15
         Do request.SetHeader("Accept","application/json")
         If auth'="" Do request.SetHeader("Authorization",auth)
-        Set sc = request.Get(base_path)
+        Set sc = request.Get(target)
         If $$$ISERR(sc) {
             Set %response.Status = "502 Bad Gateway"
             Write {"error":"request_failed","detail":($System.Status.GetErrorText(sc))}.%ToJSON()
