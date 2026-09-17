@@ -133,7 +133,7 @@ ClassMethod RequestGET() As %Status
         Quit $$$OK
     }
     If $Extract(base,$Length(base))="/" Set base=$Extract(base,1,$Length(base)-1)
-    Set target = base_path
+    Set target = base _ path
 
     Try {
         Set request = ##class(%Net.HttpRequest).%New()
