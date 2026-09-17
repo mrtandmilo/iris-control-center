@@ -48,6 +48,14 @@ ClassMethod IsSafeRelativePath(path As %String) As %Boolean [ Private ]
     Quit 1
 }
 
+ClassMethod WriteStream(stream As %Stream.Object) [ Private ]
+{
+    Do stream.Rewind()
+    While 'stream.AtEnd {
+        Write stream.Read(32767)
+    }
+}
+
 ClassMethod Health() As %Status
 {
     Set %response.ContentType = "application/json"
@@ -86,11 +94,19 @@ ClassMethod OpenAPI() As %Status
         Write {"error":"openapi_not_available","service":(service)}.%ToJSON()
         Quit $$$OK
     }
+    // Management metadata is not allowed to turn this endpoint into a generic
+    // HTTP fetcher. Specifications must be local IRIS-relative paths.
+    If '..IsSafeRelativePath(found.swagger) {
+        Set %response.Status = "502 Bad Gateway"
+        Write {"error":"invalid_openapi_location","service":(service)}.%ToJSON()
+        Quit $$$OK
+    }
 
     Try {
         Set request = ##class(%Net.HttpRequest).%New()
         Set request.Server = "127.0.0.1"
         Set request.Port = ..LocalPort()
+        Set request.Timeout = 15
         If auth'="" Do request.SetHeader("Authorization",auth)
         Set sc = request.Get(found.swagger)
         If $$$ISERR(sc) {
@@ -103,8 +119,8 @@ ClassMethod OpenAPI() As %Status
             Write {"error":"openapi_fetch_failed","upstreamStatus":(request.HttpResponse.StatusCode)}.%ToJSON()
             Quit $$$OK
         }
-        Do request.HttpResponse.Data.Rewind()
-        Write request.HttpResponse.Data.Read()
+        If request.HttpResponse.ContentType'="" Set %response.ContentType = request.HttpResponse.ContentType
+        Do ..WriteStream(request.HttpResponse.Data)
     } Catch ex {
         Set %response.Status = "502 Bad Gateway"
         Write {"error":"openapi_fetch_failed","detail":(ex.DisplayString())}.%ToJSON()
@@ -136,9 +152,9 @@ ClassMethod RequestGET() As %Status
         Quit $$$OK
     }
     Set base = found.webApplication
-    If base="" {
+    If (base="")!('..IsSafeRelativePath(base)) {
         Set %response.Status = "400 Bad Request"
-        Write {"error":"service_has_no_web_application"}.%ToJSON()
+        Write {"error":"service_has_invalid_web_application"}.%ToJSON()
         Quit $$$OK
     }
     If $Extract(base,$Length(base))="/" Set base=$Extract(base,1,$Length(base)-1)
@@ -160,8 +176,7 @@ ClassMethod RequestGET() As %Status
         Set upstream = request.HttpResponse
         Set %response.Status = upstream.StatusCode_" "_upstream.ReasonPhrase
         If upstream.ContentType'="" Set %response.ContentType = upstream.ContentType
-        Do upstream.Data.Rewind()
-        Write upstream.Data.Read()
+        Do ..WriteStream(upstream.Data)
     } Catch ex {
         Set %response.Status = "502 Bad Gateway"
         Write {"error":"request_failed","detail":(ex.DisplayString())}.%ToJSON()
