@@ -10,6 +10,16 @@ IRIS Control Center is intentionally tested as an installed IRIS application, no
 4. Confirm `/iris-control-center` and `/iris-control-center/api` exist as enabled web applications.
 5. Open `http://localhost:52773/iris-control-center/`.
 
+## Automated smoke test
+
+After the container is running, execute:
+
+```bash
+IRIS_USER=_SYSTEM IRIS_PASSWORD=SYS ./scripts/smoke-test.sh
+```
+
+The script checks that the browser application is reachable, the authenticated health endpoint reports `status: ok`, and service discovery returns a catalogue without an error payload. `BASE_URL`, `IRIS_USER`, and `IRIS_PASSWORD` can be overridden for a non-default local environment. Do not commit real credentials.
+
 ## API smoke tests
 
 With an authenticated IRIS session, verify:
@@ -51,6 +61,7 @@ Before contest submission, capture:
 
 - successful clean container build output;
 - successful ObjectScript compile/setup output;
+- successful `scripts/smoke-test.sh` output;
 - health endpoint response;
 - service catalogue screenshot;
 - OpenAPI explorer screenshot;
