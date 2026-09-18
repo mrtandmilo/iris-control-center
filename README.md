@@ -59,6 +59,7 @@ Keeping the UI and API web applications separate makes their responsibilities an
 
 - [`docs/TESTING.md`](docs/TESTING.md) defines the clean-build, API, browser and security checks that must pass before the project is described as runtime-tested.
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) documents the application boundaries and security decisions for reviewers.
+- [`docs/DEMO.md`](docs/DEMO.md) provides a repeatable three-minute judge/reviewer walkthrough and screenshot checklist.
 - [`docs/CONTEST_SUBMISSION.md`](docs/CONTEST_SUBMISSION.md) contains the evaluator-focused project summary, demo flow and final submission gate.
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) tracks the remaining delivery work.
 
