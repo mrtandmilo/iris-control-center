@@ -5,6 +5,8 @@ BASE_URL="${BASE_URL:-http://localhost:52773}"
 USER="${IRIS_USER:-_SYSTEM}"
 PASS="${IRIS_PASSWORD:-SYS}"
 API="$BASE_URL/iris-control-center/api"
+READY_TIMEOUT="${READY_TIMEOUT:-180}"
+READY_INTERVAL="${READY_INTERVAL:-3}"
 
 curl_json() {
   curl --fail --silent --show-error --user "$USER:$PASS" \
@@ -34,6 +36,29 @@ expect_json_content_type() {
     exit 1
   fi
 }
+
+wait_for_control_center() {
+  local deadline=$((SECONDS + READY_TIMEOUT))
+  local status="000"
+
+  echo "Waiting up to ${READY_TIMEOUT}s for IRIS Control Center readiness..."
+  while (( SECONDS < deadline )); do
+    status="$(curl --silent --output /dev/null --write-out '%{http_code}' \
+      --user "$USER:$PASS" --header 'Accept: application/json' \
+      --connect-timeout 2 --max-time 5 "$API/health" || true)"
+    if [[ "$status" == "200" ]]; then
+      echo "IRIS Control Center is ready."
+      return 0
+    fi
+    sleep "$READY_INTERVAL"
+  done
+
+  echo "Timed out waiting for $API/health (last HTTP status: $status)." >&2
+  echo "Check container health and IRIS setup/compile logs before retrying." >&2
+  return 1
+}
+
+wait_for_control_center
 
 echo "[1/9] Checking Control Center UI"
 curl --fail --silent --show-error "$BASE_URL/iris-control-center/" >/dev/null
