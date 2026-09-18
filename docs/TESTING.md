@@ -4,8 +4,19 @@ IRIS Control Center is intentionally tested as an installed IRIS application, no
 
 ## Build and installation
 
-1. Run `docker compose build --no-cache`.
-2. Run `docker compose up` and wait for IRIS to report healthy.
+For day-to-day development the Compose build defaults to `containers.intersystems.com/intersystems/iris-community:latest-em`. For final release validation, pin the exact IRIS Community image tag so the evidence is reproducible:
+
+```bash
+IRIS_IMAGE=containers.intersystems.com/intersystems/iris-community:<exact-tag> \
+  docker compose build --no-cache
+IRIS_IMAGE=containers.intersystems.com/intersystems/iris-community:<exact-tag> \
+  docker compose up
+```
+
+Do not use the literal `<exact-tag>` placeholder; replace it with the tested Community image tag available from the InterSystems container registry. Record that tag with the release evidence.
+
+1. Run the pinned clean build above.
+2. Run the pinned Compose stack and wait for IRIS to report healthy.
 3. Confirm the setup script imports all classes without compile errors.
 4. Confirm `/iris-control-center` and `/iris-control-center/api` exist as enabled web applications.
 5. Open `http://localhost:52773/iris-control-center/`.
@@ -68,13 +79,13 @@ With an authenticated IRIS session, verify:
 
 Before contest submission, capture:
 
-- successful clean container build output;
+- exact pinned IRIS Community image tag used for the final validation;
+- successful clean container build output using that pinned tag;
 - successful ObjectScript compile/setup output;
 - successful `scripts/smoke-test.sh` output;
 - health endpoint response;
 - service catalogue screenshot;
 - OpenAPI explorer screenshot;
-- successful safe GET execution screenshot;
-- exact IRIS Community version used for the final validation.
+- successful safe GET execution screenshot.
 
 Any failed item above blocks the claim that the application is runtime-tested. Record remaining limitations explicitly in the README rather than presenting unverified behavior as complete.
