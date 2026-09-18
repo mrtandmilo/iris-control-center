@@ -51,6 +51,37 @@ expect_json_content_type() {
   fi
 }
 
+expect_json_error() {
+  local expected_status="$1"
+  local expected_error="$2"
+  local url="$3"
+  local body_file
+  local status
+  local content_type
+  body_file="$(mktemp)"
+  trap 'rm -f "$body_file"' RETURN
+  status="$(curl --silent --show-error --max-time "$REQUEST_TIMEOUT" --user "$USER:$PASS" \
+    --output "$body_file" --write-out '%{http_code}' --header 'Accept: application/json' "$url")"
+  content_type="$(curl --silent --show-error --max-time "$REQUEST_TIMEOUT" --user "$USER:$PASS" \
+    --output /dev/null --write-out '%{content_type}' --header 'Accept: application/json' "$url")"
+  if [[ "$status" != "$expected_status" ]]; then
+    echo "Expected HTTP $expected_status from $url, got $status" >&2
+    cat "$body_file" >&2
+    exit 1
+  fi
+  if [[ "$content_type" != application/json* ]]; then
+    echo "Expected JSON content type from $url, got '$content_type'" >&2
+    exit 1
+  fi
+  if ! grep -q "\"error\":\"$expected_error\"" "$body_file"; then
+    echo "Expected error code '$expected_error' from $url, got:" >&2
+    cat "$body_file" >&2
+    exit 1
+  fi
+  rm -f "$body_file"
+  trap - RETURN
+}
+
 wait_for_control_center() {
   local deadline=$((SECONDS + READY_TIMEOUT))
   local status="000"
@@ -101,20 +132,20 @@ if printf '%s' "$services" | grep -q '"error"'; then
 fi
 
 echo "[5/9] Checking OpenAPI input validation"
-expect_status 400 "$API/openapi"
+expect_json_error 400 service_required "$API/openapi"
 
 echo "[6/9] Checking request proxy input validation"
-expect_status 400 "$API/request"
-expect_status 400 "$API/request?service=missing&path=https%3A%2F%2Fexample.com"
+expect_json_error 400 service_and_path_required "$API/request"
+expect_json_error 400 invalid_path "$API/request?service=missing&path=https%3A%2F%2Fexample.com"
 
 echo "[7/9] Checking request proxy traversal protection"
-expect_status 400 "$API/request?service=missing&path=%2F..%2Fapi%2Fmgmnt%2F"
-expect_status 400 "$API/request?service=missing&path=%2F%252e%252e%2Fapi%2Fmgmnt%2F"
+expect_json_error 400 invalid_path "$API/request?service=missing&path=%2F..%2Fapi%2Fmgmnt%2F"
+expect_json_error 400 invalid_path "$API/request?service=missing&path=%2F%252e%252e%2Fapi%2Fmgmnt%2F"
 
 echo "[8/9] Checking unknown service isolation"
-expect_status 404 "$API/request?service=__control_center_missing__&path=%2F"
+expect_json_error 404 service_not_found "$API/request?service=__control_center_missing__&path=%2F"
 
 echo "[9/9] Checking unknown OpenAPI service isolation"
-expect_status 404 "$API/openapi?service=__control_center_missing__"
+expect_json_error 404 service_not_found "$API/openapi?service=__control_center_missing__"
 
 echo "IRIS Control Center smoke test passed."
