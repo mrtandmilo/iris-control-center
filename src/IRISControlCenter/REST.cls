@@ -111,8 +111,11 @@ ClassMethod OpenAPI() As %Status
         If auth'="" Do request.SetHeader("Authorization",auth)
         Set sc = request.Get(found.swagger)
         If $$$ISERR(sc) {
+            // Do not expose IRIS status text, network details, or internal paths
+            // to the browser. The HTTP status and stable error code are enough
+            // for callers; server-side diagnostics remain available in IRIS.
             Set %response.Status = "502 Bad Gateway"
-            Write {"error":"openapi_fetch_failed","detail":($System.Status.GetErrorText(sc))}.%ToJSON()
+            Write {"error":"openapi_fetch_failed"}.%ToJSON()
             Quit $$$OK
         }
         If request.HttpResponse.StatusCode '= 200 {
@@ -124,7 +127,7 @@ ClassMethod OpenAPI() As %Status
         Do ..WriteStream(request.HttpResponse.Data)
     } Catch ex {
         Set %response.Status = "502 Bad Gateway"
-        Write {"error":"openapi_fetch_failed","detail":(ex.DisplayString())}.%ToJSON()
+        Write {"error":"openapi_fetch_failed"}.%ToJSON()
     }
     Quit $$$OK
 }
@@ -171,7 +174,7 @@ ClassMethod RequestGET() As %Status
         Set sc = request.Get(target)
         If $$$ISERR(sc) {
             Set %response.Status = "502 Bad Gateway"
-            Write {"error":"request_failed","detail":($System.Status.GetErrorText(sc))}.%ToJSON()
+            Write {"error":"request_failed"}.%ToJSON()
             Quit $$$OK
         }
         Set upstream = request.HttpResponse
@@ -180,7 +183,7 @@ ClassMethod RequestGET() As %Status
         Do ..WriteStream(upstream.Data)
     } Catch ex {
         Set %response.Status = "502 Bad Gateway"
-        Write {"error":"request_failed","detail":(ex.DisplayString())}.%ToJSON()
+        Write {"error":"request_failed"}.%ToJSON()
     }
     Quit $$$OK
 }
