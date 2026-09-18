@@ -9,6 +9,19 @@ READY_TIMEOUT="${READY_TIMEOUT:-180}"
 READY_INTERVAL="${READY_INTERVAL:-3}"
 REQUEST_TIMEOUT="${REQUEST_TIMEOUT:-15}"
 
+require_positive_integer() {
+  local name="$1"
+  local value="$2"
+  if [[ ! "$value" =~ ^[1-9][0-9]*$ ]]; then
+    echo "$name must be a positive integer number of seconds (got '$value')." >&2
+    exit 2
+  fi
+}
+
+require_positive_integer READY_TIMEOUT "$READY_TIMEOUT"
+require_positive_integer READY_INTERVAL "$READY_INTERVAL"
+require_positive_integer REQUEST_TIMEOUT "$REQUEST_TIMEOUT"
+
 curl_json() {
   curl --fail --silent --show-error --max-time "$REQUEST_TIMEOUT" --user "$USER:$PASS" \
     --header 'Accept: application/json' "$1"
