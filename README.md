@@ -40,7 +40,7 @@ The API is mounted separately at `/iris-control-center/api`. Authentication is d
 
 The application has three deliberately small layers:
 
-1. **IRIS discovery adapter** — queries `/api/mgmnt/v2/` and normalizes service metadata.
+1. **IRIS discovery adapter** — queries the legacy `/api/mgmnt/` catalogue and normalizes service metadata. This endpoint is used deliberately because it exposes both generated and manually configured REST applications needed by the portal.
 2. **IRIS REST backend** — exposes health, catalogue and OpenAPI endpoints to the UI while forwarding the authenticated IRIS session where required.
 3. **Browser Control Center** — searchable service catalogue, OpenAPI viewer and safe GET request workbench.
 
