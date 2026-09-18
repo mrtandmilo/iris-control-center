@@ -44,7 +44,7 @@ The application has three deliberately small layers:
 2. **IRIS REST backend** — exposes health, catalogue and OpenAPI endpoints to the UI while forwarding the authenticated IRIS session where required.
 3. **Browser Control Center** — searchable service catalogue, OpenAPI viewer and safe GET request workbench.
 
-Keeping the UI and API web applications separate makes their responsibilities and security settings explicit while allowing the UI to use the user's existing IRIS session.
+Keeping the UI and API web applications separate makes their responsibilities and security settings explicit while allowing the UI to use the user's existing IRIS session. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the component diagram, request flow and trust-boundary rationale.
 
 ## Security principles
 
@@ -58,6 +58,7 @@ Keeping the UI and API web applications separate makes their responsibilities an
 ## Validation and contest preparation
 
 - [`docs/TESTING.md`](docs/TESTING.md) defines the clean-build, API, browser and security checks that must pass before the project is described as runtime-tested.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) documents the application boundaries and security decisions for reviewers.
 - [`docs/CONTEST_SUBMISSION.md`](docs/CONTEST_SUBMISSION.md) contains the evaluator-focused project summary, demo flow and final submission gate.
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) tracks the remaining delivery work.
 
