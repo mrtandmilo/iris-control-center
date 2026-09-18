@@ -7,9 +7,10 @@ PASS="${IRIS_PASSWORD:-SYS}"
 API="$BASE_URL/iris-control-center/api"
 READY_TIMEOUT="${READY_TIMEOUT:-180}"
 READY_INTERVAL="${READY_INTERVAL:-3}"
+REQUEST_TIMEOUT="${REQUEST_TIMEOUT:-15}"
 
 curl_json() {
-  curl --fail --silent --show-error --user "$USER:$PASS" \
+  curl --fail --silent --show-error --max-time "$REQUEST_TIMEOUT" --user "$USER:$PASS" \
     --header 'Accept: application/json' "$1"
 }
 
@@ -18,7 +19,7 @@ expect_status() {
   local url="$2"
   local actual
   actual="$(curl --silent --output /dev/null --write-out '%{http_code}' \
-    --user "$USER:$PASS" --header 'Accept: application/json' "$url")"
+    --max-time "$REQUEST_TIMEOUT" --user "$USER:$PASS" --header 'Accept: application/json' "$url")"
   if [[ "$actual" != "$expected" ]]; then
     echo "Expected HTTP $expected from $url, got $actual" >&2
     exit 1
@@ -28,7 +29,7 @@ expect_status() {
 expect_json_content_type() {
   local url="$1"
   local content_type
-  content_type="$(curl --silent --show-error --user "$USER:$PASS" \
+  content_type="$(curl --silent --show-error --max-time "$REQUEST_TIMEOUT" --user "$USER:$PASS" \
     --output /dev/null --write-out '%{content_type}' \
     --header 'Accept: application/json' "$url")"
   if [[ "$content_type" != application/json* ]]; then
@@ -61,11 +62,11 @@ wait_for_control_center() {
 wait_for_control_center
 
 echo "[1/9] Checking Control Center UI"
-curl --fail --silent --show-error "$BASE_URL/iris-control-center/" >/dev/null
+curl --fail --silent --show-error --max-time "$REQUEST_TIMEOUT" "$BASE_URL/iris-control-center/" >/dev/null
 
 echo "[2/9] Checking browser assets"
-curl --fail --silent --show-error "$BASE_URL/iris-control-center/app.js" >/dev/null
-curl --fail --silent --show-error "$BASE_URL/iris-control-center/app.css" >/dev/null
+curl --fail --silent --show-error --max-time "$REQUEST_TIMEOUT" "$BASE_URL/iris-control-center/app.js" >/dev/null
+curl --fail --silent --show-error --max-time "$REQUEST_TIMEOUT" "$BASE_URL/iris-control-center/app.css" >/dev/null
 
 echo "[3/9] Checking API health contract"
 expect_json_content_type "$API/health"
