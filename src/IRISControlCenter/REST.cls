@@ -40,11 +40,12 @@ ClassMethod IsSafeRelativePath(path As %String) As %Boolean [ Private ]
     Set lower = $ZConvert(path,"L")
     If (lower["://")!(lower["\\") Quit 0
     // Keep the proxy pinned beneath the selected IRIS web application. Reject
-    // literal and percent-encoded dot segments before the upstream server gets
-    // an opportunity to normalize them.
+    // literal, encoded, and double-encoded dot segments before the upstream
+    // server gets an opportunity to normalize or decode them again.
     Set pathname = $Piece(lower,"?",1)
     If (pathname="/..")!(pathname["/../")!($Extract(pathname,$Length(pathname)-2,*)="/..") Quit 0
     If (pathname["%2e%2e")!(pathname["%2e.")!(pathname[".%2e") Quit 0
+    If (pathname["%252e%252e")!(pathname["%252e.")!(pathname[".%252e") Quit 0
     Quit 1
 }
 
