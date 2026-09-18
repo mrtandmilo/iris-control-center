@@ -52,17 +52,34 @@ A concise evaluator demo should show:
 8. Show the HTTP status and formatted response.
 9. Point out that mutating methods are intentionally inspect-only.
 
+## Verified contest requirements
+
+The official 2026 **Build Your Own Management Portal** announcement defines the relevant release requirements for this project:
+
+- the application must be fully functional and sufficiently original/useful for contest approval;
+- it must work on IRIS Community Edition or IRIS for Health Community Edition;
+- it must be open source and published on GitHub or GitLab;
+- its README must be in English, include installation steps, and include either a video demo or a description of how the application works;
+- the submission deadline is **September 27, 2026 at 23:59 EST**;
+- improvements may continue during the subsequent voting period.
+
+The contest task explicitly includes **managing web apps and exploring REST APIs**, which is the scope targeted by IRIS Control Center.
+
 ## Final release gate
 
 Do not describe the application as tested until every applicable item in `docs/TESTING.md` has been validated against the target IRIS Community container.
 
 Before submission:
 
-- make the repository publicly accessible as required by the contest;
-- confirm the final contest rules, eligibility and submission deadline at the official source;
-- validate a clean installation from the public repository;
-- add final screenshots/demo media;
-- record the tested IRIS version;
-- verify README links and installation instructions;
-- perform a credentials/secrets review;
-- obtain the repository owner’s explicit approval before the final contest submission.
+- [ ] Confirm the repository is publicly accessible.
+- [ ] Confirm the application is open source and the MIT license is present.
+- [ ] Validate a clean installation against IRIS Community Edition from the public repository.
+- [ ] Run the complete runtime checklist in `docs/TESTING.md` and capture the tested IRIS version.
+- [ ] Verify the English README contains working installation steps and an accurate description/demo of the application.
+- [ ] Add final screenshots and/or demo media that reflect the tested build.
+- [ ] Verify README and documentation links from a clean checkout.
+- [ ] Perform a final credentials/secrets and generated-artifact review.
+- [ ] Confirm any Open Exchange/contest-registration requirements and current competition terms at the official source immediately before submission.
+- [ ] Obtain the repository owner’s explicit approval before accepting contest terms or making the final submission.
+
+The technical release can be prepared without accepting competition terms. Registration, identity verification if later required for a prize, and the final contest submission remain owner-controlled actions.
