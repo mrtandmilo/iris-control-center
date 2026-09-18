@@ -12,13 +12,22 @@ IRIS Control Center is intentionally tested as an installed IRIS application, no
 
 ## Automated smoke test
 
-After the container is running, execute:
+After starting the container, execute:
 
 ```bash
 IRIS_USER=_SYSTEM IRIS_PASSWORD=SYS ./scripts/smoke-test.sh
 ```
 
-The script checks that the browser application is reachable, the authenticated health endpoint reports `status: ok`, and service discovery returns a catalogue without an error payload. `BASE_URL`, `IRIS_USER`, and `IRIS_PASSWORD` can be overridden for a non-default local environment. Do not commit real credentials.
+The smoke test waits for the authenticated Control Center health endpoint before running the full contract and security suite, so a normal IRIS startup does not produce a false failure. By default it allows 180 seconds for readiness, polls every 3 seconds, and bounds each HTTP request to 15 seconds. These values can be adjusted when validating slower environments:
+
+```bash
+READY_TIMEOUT=300 READY_INTERVAL=5 REQUEST_TIMEOUT=30 \
+  IRIS_USER=_SYSTEM IRIS_PASSWORD=SYS ./scripts/smoke-test.sh
+```
+
+`BASE_URL`, `IRIS_USER`, and `IRIS_PASSWORD` can also be overridden for a non-default local environment. Do not commit real credentials.
+
+A successful run verifies the browser shell/assets, authenticated health response, JSON response contracts, service discovery, OpenAPI error isolation, request-proxy validation, and traversal protections. A timeout or failed assertion is a release-gate failure and must not be treated as a successful runtime validation.
 
 ## API smoke tests
 
