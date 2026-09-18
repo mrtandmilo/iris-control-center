@@ -3,17 +3,22 @@ import fs from 'node:fs';
 const html = fs.readFileSync('web/index.html', 'utf8');
 const js = fs.readFileSync('web/app.js', 'utf8');
 
-const ids = new Set([...html.matchAll(/\bid=["']([^"']+)["']/g)].map(match => match[1]));
+const staticIds = new Set([...html.matchAll(/\bid=["']([^"']+)["']/g)].map(match => match[1]));
+// app.js intentionally renders parts of the detail pane (including #endpoints)
+// at runtime. Include literal ids created by its HTML templates so the check
+// distinguishes a genuine dangling reference from a dynamically rendered node.
+const dynamicIds = new Set([...js.matchAll(/\bid=\\?["']([^\\"']+)\\?["']/g)].map(match => match[1]));
+const availableIds = new Set([...staticIds, ...dynamicIds]);
 const referencedIds = new Set([...js.matchAll(/\bel\(['"]([^'"]+)['"]\)/g)].map(match => match[1]));
 
-const missing = [...referencedIds].filter(id => !ids.has(id));
+const missing = [...referencedIds].filter(id => !availableIds.has(id));
 if (missing.length) {
   console.error(`app.js references missing HTML element id(s): ${missing.join(', ')}`);
   process.exit(1);
 }
 
 for (const required of ['services', 'filter', 'refresh', 'count', 'detail']) {
-  if (!ids.has(required)) {
+  if (!staticIds.has(required)) {
     console.error(`Required UI element #${required} is missing from web/index.html`);
     process.exit(1);
   }
@@ -29,4 +34,4 @@ if (!js.includes("credentials:'same-origin'")) {
   process.exit(1);
 }
 
-console.log(`UI integrity OK: ${referencedIds.size} referenced element IDs are present.`);
+console.log(`UI integrity OK: ${referencedIds.size} referenced element IDs resolve statically or through rendered templates.`);
