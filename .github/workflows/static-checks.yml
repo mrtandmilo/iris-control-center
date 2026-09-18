@@ -17,8 +17,14 @@ jobs:
       - name: Validate browser JavaScript syntax
         run: node --check web/app.js
 
+      - name: Validate browser shell integrity
+        run: node scripts/static-ui-check.mjs
+
       - name: Validate shell script syntax
         run: bash -n scripts/smoke-test.sh
+
+      - name: Validate Docker Compose configuration
+        run: docker compose config --quiet
 
       - name: Validate required contest files
         shell: bash
