@@ -1,0 +1,44 @@
+name: Static checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate browser JavaScript syntax
+        run: node --check web/app.js
+
+      - name: Validate shell script syntax
+        run: bash -n scripts/smoke-test.sh
+
+      - name: Validate required contest files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s README.md
+          test -s LICENSE
+          test -s Dockerfile
+          test -s docker-compose.yml
+          test -s docs/TESTING.md
+          test -s docs/CONTEST_SUBMISSION.md
+          test -s src/IRISControlCenter/Installer.cls
+          test -s src/IRISControlCenter/REST.cls
+          test -s src/IRISControlCenter/ServiceDiscovery.cls
+
+      - name: Guard against committed secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git grep -nEi '(authorization:[[:space:]]*(basic|bearer)[[:space:]]+[A-Za-z0-9+/_.=-]{8,}|password[[:space:]]*[:=][[:space:]]*["'"''][^$][^"'"'']{5,}["'"''])' -- ':!docs/*' ':!scripts/smoke-test.sh'; then
+            echo 'Potential hard-coded credential found.' >&2
+            exit 1
+          fi
