@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        IMAGE: ${IRIS_IMAGE:-containers.intersystems.com/intersystems/iris-community:latest-em}
     init: true
     ports:
       - "1972:1972"
