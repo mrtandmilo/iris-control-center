@@ -38,7 +38,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git grep -nEi '(authorization:[[:space:]]*(basic|bearer)[[:space:]]+[A-Za-z0-9+/_.=-]{8,}|password[[:space:]]*[:=][[:space:]]*["'"''][^$][^"'"'']{5,}["'"''])' -- ':!docs/*' ':!scripts/smoke-test.sh'; then
+          pattern='authorization:[[:space:]]*(basic|bearer)[[:space:]]+[A-Za-z0-9+/_.=-]{8,}|password[[:space:]]*[:=][[:space:]]*[^$[:space:]][^[:space:]]{5,}'
+          if git grep -nEi "$pattern" -- ':!docs/*' ':!scripts/smoke-test.sh'; then
             echo 'Potential hard-coded credential found.' >&2
             exit 1
           fi
