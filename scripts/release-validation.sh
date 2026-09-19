@@ -29,6 +29,16 @@ done
 
 docker compose version >/dev/null 2>&1 || { echo "Docker Compose v2 is required" >&2; exit 2; }
 
+# The image build consumes the whole checkout as its Docker context. Refuse a
+# release-evidence run when tracked or untracked files differ from HEAD so the
+# reported commit identifies exactly what was validated.
+if [[ -n "$(git status --porcelain --untracked-files=normal)" ]]; then
+  echo 'Release validation requires a clean Git worktree so the recorded commit exactly identifies the validated source.' >&2
+  echo 'Commit, stash, or remove local changes/untracked files before retrying.' >&2
+  git status --short >&2
+  exit 2
+fi
+
 printf 'Release validation image: %s\n' "$IRIS_IMAGE"
 printf 'Git commit: %s\n' "$(git rev-parse HEAD)"
 printf 'Validation UTC: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
