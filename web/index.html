@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="IRIS Control Center discovers registered InterSystems IRIS REST services and explores their OpenAPI definitions from one focused workspace.">
 <title>IRIS Control Center</title>
 <link rel="stylesheet" href="app.css">
 </head>
@@ -10,8 +11,8 @@
 <main>
 <section class="hero"><p class="eyebrow">INTERSYSTEMS IRIS</p><h1>REST services, without the hunting.</h1><p>Discover registered services, inspect their OpenAPI definitions and explore endpoints from one focused workspace.</p></section>
 <section class="grid">
-<aside><div class="section-title">Services <span id="count" aria-live="polite">0</span></div><input id="filter" type="search" aria-label="Filter services" placeholder="Filter services…" autocomplete="off" aria-controls="services"><div id="services" class="services" aria-live="polite"><p class="muted">Loading services…</p></div></aside>
-<article id="detail"><div class="empty"><h2>Select a service</h2><p>Choose a registered REST service to inspect its metadata and API definition.</p></div></article>
+<aside aria-labelledby="services-heading"><div class="section-title" id="services-heading">Services <span id="count" aria-live="polite">0</span></div><input id="filter" type="search" aria-label="Filter services" placeholder="Filter services…" autocomplete="off" aria-controls="services"><div id="services" class="services" aria-live="polite"><p class="muted">Loading services…</p></div></aside>
+<article id="detail" aria-live="polite" aria-atomic="false"><div class="empty"><h2>Select a service</h2><p>Choose a registered REST service to inspect its metadata and API definition.</p></div></article>
 </section>
 </main>
 <script src="app.js"></script>
