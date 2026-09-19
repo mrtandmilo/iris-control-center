@@ -6,7 +6,15 @@ This is the short, repeatable demonstration path for judges and reviewers. It is
 
 1. Start the application with `docker compose up --build`.
 2. Wait for IRIS to become healthy and for the setup script to finish.
-3. Run `IRIS_USER=_SYSTEM IRIS_PASSWORD=SYS ./scripts/smoke-test.sh` and do not record a demo until it passes.
+3. Run the smoke suite without placing a password in shell history:
+
+   ```bash
+   read -rsp "IRIS password: " IRIS_PASSWORD; echo
+   IRIS_USER=_SYSTEM IRIS_PASSWORD="$IRIS_PASSWORD" ./scripts/smoke-test.sh
+   unset IRIS_PASSWORD
+   ```
+
+   Do not record a demo until it passes. For the repository's unchanged local Community development image, the smoke script's documented development defaults may also be used; explicit credentials are preferable when validating a non-default environment.
 4. Open `http://localhost:52773/iris-control-center/` and authenticate to IRIS if prompted.
 5. Use only non-sensitive local test data. Never display real credentials, tokens, customer data, or private infrastructure details.
 
