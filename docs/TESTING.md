@@ -23,17 +23,20 @@ Do not use the literal `<exact-tag>` placeholder; replace it with the tested Com
 
 ## Automated smoke test
 
-After starting the container, execute:
+After starting the container, prompt for the IRIS password so it is not written into shell history, then execute the suite:
 
 ```bash
-IRIS_USER=_SYSTEM IRIS_PASSWORD=SYS ./scripts/smoke-test.sh
+read -rs -p 'IRIS password: ' IRIS_PASSWORD; echo
+export IRIS_PASSWORD
+IRIS_USER=_SYSTEM ./scripts/smoke-test.sh
+unset IRIS_PASSWORD
 ```
 
-The smoke test waits for the authenticated Control Center health endpoint before running the full contract and security suite, so a normal IRIS startup does not produce a false failure. By default it allows 180 seconds for readiness, polls every 3 seconds, and bounds each HTTP request to 15 seconds. These values can be adjusted when validating slower environments:
+The smoke test deliberately has no default password and fails fast if `IRIS_PASSWORD` is absent. It waits for the authenticated Control Center health endpoint before running the full contract and security suite, so a normal IRIS startup does not produce a false failure. By default it allows 180 seconds for readiness, polls every 3 seconds, and bounds each HTTP request to 15 seconds. These values can be adjusted when validating slower environments:
 
 ```bash
 READY_TIMEOUT=300 READY_INTERVAL=5 REQUEST_TIMEOUT=30 \
-  IRIS_USER=_SYSTEM IRIS_PASSWORD=SYS ./scripts/smoke-test.sh
+  IRIS_USER=_SYSTEM ./scripts/smoke-test.sh
 ```
 
 `BASE_URL`, `IRIS_USER`, and `IRIS_PASSWORD` can also be overridden for a non-default local environment. Do not commit real credentials.
