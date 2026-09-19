@@ -5,7 +5,9 @@ Class IRISControlCenter.ServiceDiscovery Extends %RegisteredObject
 /// in the current IRIS instance. The legacy management endpoint is intentional:
 /// unlike /api/mgmnt/v2/, it includes both generated and manually-coded REST
 /// applications, which makes it the more complete discovery source for a portal.
-ClassMethod GetCatalogue(authHeader As %String = "") As %DynamicObject
+/// Forward both HTTP Authorization and Cookie because IRIS deployments may use
+/// either Basic authentication or an authenticated CSP session.
+ClassMethod GetCatalogue(authHeader As %String = "", cookieHeader As %String = "") As %DynamicObject
 {
     Set result = {"services":[],"source":"/api/mgmnt/","count":0}
 
@@ -16,6 +18,7 @@ ClassMethod GetCatalogue(authHeader As %String = "") As %DynamicObject
         Set request.Https = 0
         Set request.Timeout = 15
         If authHeader'="" Do request.SetHeader("Authorization",authHeader)
+        If cookieHeader'="" Do request.SetHeader("Cookie",cookieHeader)
         Set sc = request.Get("/api/mgmnt/")
         If $$$ISERR(sc) {
             // Keep transport and IRIS status details out of the browser-facing
