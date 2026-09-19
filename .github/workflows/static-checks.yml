@@ -34,8 +34,11 @@ jobs:
           test -s LICENSE
           test -s Dockerfile
           test -s docker-compose.yml
+          test -s docs/ARCHITECTURE.md
+          test -s docs/DEMO.md
           test -s docs/TESTING.md
           test -s docs/CONTEST_SUBMISSION.md
+          test -s docs/RELEASE_EVIDENCE.md
           test -s src/IRISControlCenter/Installer.cls
           test -s src/IRISControlCenter/REST.cls
           test -s src/IRISControlCenter/ServiceDiscovery.cls
