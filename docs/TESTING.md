@@ -4,22 +4,32 @@ IRIS Control Center is intentionally tested as an installed IRIS application, no
 
 ## Build and installation
 
-For day-to-day development the Compose build defaults to `containers.intersystems.com/intersystems/iris-community:latest-em`. For final release validation, pin the exact IRIS Community image tag so the evidence is reproducible:
+For day-to-day development the Compose build defaults to `containers.intersystems.com/intersystems/iris-community:latest-em`. For final release validation, pin the exact IRIS Community image tag so the evidence is reproducible.
+
+First remove the existing Compose stack **and its named data volume**. A no-cache image build alone is not a clean IRIS installation because `iris-data` persists between runs:
 
 ```bash
-IRIS_IMAGE=containers.intersystems.com/intersystems/iris-community:<exact-tag> \
-  docker compose build --no-cache
-IRIS_IMAGE=containers.intersystems.com/intersystems/iris-community:<exact-tag> \
-  docker compose up
+docker compose down -v --remove-orphans
 ```
 
-Do not use the literal `<exact-tag>` placeholder; replace it with the tested Community image tag available from the InterSystems container registry. Record that tag with the release evidence.
+This command deletes the local IRIS data volume for this Compose project. Use it only for the disposable contest-validation instance, never for an IRIS instance containing data that must be retained.
 
-1. Run the pinned clean build above.
-2. Run the pinned Compose stack and wait for IRIS to report healthy.
-3. Confirm the setup script imports all classes without compile errors.
-4. Confirm `/iris-control-center` and `/iris-control-center/api` exist as enabled web applications.
-5. Open `http://localhost:52773/iris-control-center/`.
+Then build and start with the same pinned image tag:
+
+```bash
+export IRIS_IMAGE=containers.intersystems.com/intersystems/iris-community:<exact-tag>
+docker compose build --no-cache
+docker compose up
+```
+
+Do not use the literal `<exact-tag>` placeholder; replace it with the tested Community image tag available from the InterSystems container registry. Record that tag with the release evidence. Keeping `IRIS_IMAGE` exported for both commands also prevents the build and runtime steps from accidentally resolving different defaults.
+
+1. Remove the disposable validation stack and `iris-data` volume with `docker compose down -v --remove-orphans`.
+2. Export the exact IRIS Community image tag and run the no-cache build above.
+3. Start the pinned Compose stack and wait for IRIS to report healthy.
+4. Confirm the setup script imports all classes without compile errors.
+5. Confirm `/iris-control-center` and `/iris-control-center/api` exist as enabled web applications.
+6. Open `http://localhost:52773/iris-control-center/`.
 
 ## Automated smoke test
 
@@ -85,6 +95,7 @@ With an authenticated IRIS session, verify:
 Before contest submission, capture:
 
 - exact pinned IRIS Community image tag used for the final validation;
+- confirmation that the disposable validation data volume was removed before the build;
 - successful clean container build output using that pinned tag;
 - successful ObjectScript compile/setup output;
 - successful `scripts/smoke-test.sh` output;
