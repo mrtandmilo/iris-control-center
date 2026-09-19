@@ -17,14 +17,20 @@ if [[ "$IRIS_IMAGE" == *":latest" || "$IRIS_IMAGE" == *":latest-"* || "$IRIS_IMA
   exit 2
 fi
 
-for command in docker curl; do
+CONTAINER_HEALTH_TIMEOUT="${CONTAINER_HEALTH_TIMEOUT:-240}"
+if [[ ! "$CONTAINER_HEALTH_TIMEOUT" =~ ^[1-9][0-9]*$ ]]; then
+  echo "CONTAINER_HEALTH_TIMEOUT must be a positive integer number of seconds (got '$CONTAINER_HEALTH_TIMEOUT')." >&2
+  exit 2
+fi
+
+for command in docker curl git; do
   command -v "$command" >/dev/null 2>&1 || { echo "Required command not found: $command" >&2; exit 2; }
 done
 
 docker compose version >/dev/null 2>&1 || { echo "Docker Compose v2 is required" >&2; exit 2; }
 
 printf 'Release validation image: %s\n' "$IRIS_IMAGE"
-printf 'Git commit: %s\n' "$(git rev-parse HEAD 2>/dev/null || printf unknown)"
+printf 'Git commit: %s\n' "$(git rev-parse HEAD)"
 printf 'Validation UTC: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 echo 'Removing disposable validation stack and data volume...'
@@ -42,7 +48,7 @@ if [[ -z "$container_id" ]]; then
   exit 1
 fi
 
-health_deadline=$((SECONDS + ${CONTAINER_HEALTH_TIMEOUT:-240}))
+health_deadline=$((SECONDS + CONTAINER_HEALTH_TIMEOUT))
 while (( SECONDS < health_deadline )); do
   health="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$container_id" 2>/dev/null || true)"
   case "$health" in
