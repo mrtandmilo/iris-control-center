@@ -25,6 +25,33 @@ jobs:
           bash -n scripts/smoke-test.sh
           bash -n scripts/release-validation.sh
 
+      - name: Validate release fail-fast guards
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # These invalid configurations must be rejected before release
+          # validation can pull images, remove volumes, or otherwise mutate the
+          # Docker environment. A zero exit code would mean a safety regression.
+          if IRIS_IMAGE=containers.intersystems.com/intersystems/iris-community:latest \
+             IRIS_PASSWORD=ci-only-placeholder \
+             ./scripts/release-validation.sh >/tmp/release-latest.out 2>&1; then
+            cat /tmp/release-latest.out >&2
+            echo 'release-validation.sh accepted an unpinned latest image.' >&2
+            exit 1
+          fi
+          grep -q 'explicit non-latest tag' /tmp/release-latest.out
+
+          if IRIS_IMAGE=containers.intersystems.com/intersystems/iris-community:2026.1-ci-placeholder \
+             IRIS_PASSWORD=ci-only-placeholder \
+             CONTAINER_HEALTH_TIMEOUT=0 \
+             ./scripts/release-validation.sh >/tmp/release-timeout.out 2>&1; then
+            cat /tmp/release-timeout.out >&2
+            echo 'release-validation.sh accepted an invalid health timeout.' >&2
+            exit 1
+          fi
+          grep -q 'positive integer' /tmp/release-timeout.out
+
       - name: Validate Docker Compose configuration
         run: docker compose config --quiet
 
