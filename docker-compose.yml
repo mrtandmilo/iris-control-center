@@ -13,6 +13,11 @@ services:
       - iris-data:/home/irisowner/irisdata
     environment:
       - ISC_DATA_DIRECTORY=/home/irisowner/irisdata
+      # The Community image consumes IRIS_PASSWORD while initializing a fresh
+      # durable instance. Keeping the Compose value aligned with smoke/release
+      # validation ensures the credentials used by tests are the credentials
+      # configured in the container rather than an unrelated image default.
+      - IRIS_PASSWORD=${IRIS_PASSWORD:-SYS}
     command: --check-caps false
     healthcheck:
       test: ["CMD-SHELL", "iris status IRIS >/dev/null 2>&1 || exit 1"]
