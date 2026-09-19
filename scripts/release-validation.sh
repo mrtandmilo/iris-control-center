@@ -80,7 +80,12 @@ if [[ "$health" != healthy ]]; then
 fi
 
 echo 'Container healthy; running application acceptance suite...'
+# If acceptance fails, preserve the failing stack but print the IRIS log in the
+# same release transcript. This makes a clean-run failure diagnosable without
+# rerunning (and potentially changing) the evidence-producing environment.
+trap 'status=$?; echo "Acceptance suite failed (exit $status); IRIS logs follow:" >&2; docker compose logs --no-color iris >&2 || true; exit "$status"' ERR
 IRIS_USER="${IRIS_USER:-_SYSTEM}" ./scripts/smoke-test.sh
+trap - ERR
 
 echo
 echo 'Release validation passed.'
