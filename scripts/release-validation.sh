@@ -39,15 +39,32 @@ if [[ -n "$(git status --porcelain --untracked-files=normal)" ]]; then
   exit 2
 fi
 
-printf 'Release validation image: %s\n' "$IRIS_IMAGE"
+printf 'Release validation image tag: %s\n' "$IRIS_IMAGE"
 printf 'Git commit: %s\n' "$(git rev-parse HEAD)"
 printf 'Validation UTC: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 echo 'Removing disposable validation stack and data volume...'
 docker compose down -v --remove-orphans
 
-echo 'Building from scratch...'
-docker compose build --no-cache
+echo 'Building from scratch against the current pinned base image...'
+# --pull ensures the explicit release tag is resolved afresh instead of silently
+# validating an older local copy of a mutable registry tag. We record the image
+# ID below as immutable evidence of the exact base bytes used by this run.
+docker compose build --pull --no-cache
+
+base_image_id="$(docker image inspect --format '{{.Id}}' "$IRIS_IMAGE" 2>/dev/null || true)"
+if [[ -z "$base_image_id" ]]; then
+  echo "Unable to resolve the built IRIS base image ID for $IRIS_IMAGE." >&2
+  exit 1
+fi
+printf 'IRIS base image ID: %s\n' "$base_image_id"
+
+base_repo_digests="$(docker image inspect --format '{{join .RepoDigests ","}}' "$IRIS_IMAGE" 2>/dev/null || true)"
+if [[ -n "$base_repo_digests" ]]; then
+  printf 'IRIS base repository digest(s): %s\n' "$base_repo_digests"
+else
+  echo 'IRIS base repository digest(s): unavailable; image ID above is the immutable local evidence.'
+fi
 
 echo 'Starting IRIS...'
 docker compose up -d
