@@ -3,11 +3,16 @@ set -euo pipefail
 
 BASE_URL="${BASE_URL:-http://localhost:52773}"
 USER="${IRIS_USER:-_SYSTEM}"
-PASS="${IRIS_PASSWORD:-SYS}"
+PASS="${IRIS_PASSWORD:-}"
 API="$BASE_URL/iris-control-center/api"
 READY_TIMEOUT="${READY_TIMEOUT:-180}"
 READY_INTERVAL="${READY_INTERVAL:-3}"
 REQUEST_TIMEOUT="${REQUEST_TIMEOUT:-15}"
+
+if [[ -z "$PASS" ]]; then
+  echo "IRIS_PASSWORD must be set for authenticated runtime validation." >&2
+  exit 2
+fi
 
 require_positive_integer() {
   local name="$1"
