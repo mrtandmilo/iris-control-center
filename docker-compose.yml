@@ -14,6 +14,12 @@ services:
     environment:
       - ISC_DATA_DIRECTORY=/home/irisowner/irisdata
     command: --check-caps false
+    healthcheck:
+      test: ["CMD-SHELL", "iris status IRIS >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 24
+      start_period: 30s
 
 volumes:
   iris-data:
