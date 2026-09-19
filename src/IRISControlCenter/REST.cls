@@ -18,14 +18,27 @@ ClassMethod AuthHeader() As %String [ Private ]
     Quit %request.GetCgiEnv("HTTP_AUTHORIZATION","")
 }
 
+ClassMethod CookieHeader() As %String [ Private ]
+{
+    Quit %request.GetCgiEnv("HTTP_COOKIE","")
+}
+
+ClassMethod ApplyInboundAuth(request As %Net.HttpRequest) [ Private ]
+{
+    Set auth = ..AuthHeader()
+    Set cookie = ..CookieHeader()
+    If auth'="" Do request.SetHeader("Authorization",auth)
+    If cookie'="" Do request.SetHeader("Cookie",cookie)
+}
+
 ClassMethod LocalPort() As %Integer [ Private ]
 {
     Quit $Select($Get(^%SYS("WebServer","Port"))'="":$Get(^%SYS("WebServer","Port")),1:52773)
 }
 
-ClassMethod CatalogueService(service As %String, auth As %String) As %DynamicObject [ Private ]
+ClassMethod CatalogueService(service As %String) As %DynamicObject [ Private ]
 {
-    Set catalogue = ##class(IRISControlCenter.ServiceDiscovery).GetCatalogue(auth)
+    Set catalogue = ##class(IRISControlCenter.ServiceDiscovery).GetCatalogue(..AuthHeader(),..CookieHeader())
     Set found = ""
     Set iter = catalogue.services.%GetIterator()
     While iter.%GetNext(.key,.item) {
@@ -68,7 +81,7 @@ ClassMethod Health() As %Status
 ClassMethod Services() As %Status
 {
     Set %response.ContentType = "application/json"
-    Set response = ##class(IRISControlCenter.ServiceDiscovery).GetCatalogue(..AuthHeader())
+    Set response = ##class(IRISControlCenter.ServiceDiscovery).GetCatalogue(..AuthHeader(),..CookieHeader())
     Write response.%ToJSON()
     Quit $$$OK
 }
@@ -83,8 +96,7 @@ ClassMethod OpenAPI() As %Status
         Quit $$$OK
     }
 
-    Set auth = ..AuthHeader()
-    Set found = ..CatalogueService(service,auth)
+    Set found = ..CatalogueService(service)
     If '$IsObject(found) {
         Set %response.Status = "404 Not Found"
         Write {"error":"service_not_found","service":(service)}.%ToJSON()
@@ -108,12 +120,9 @@ ClassMethod OpenAPI() As %Status
         Set request.Server = "127.0.0.1"
         Set request.Port = ..LocalPort()
         Set request.Timeout = 15
-        If auth'="" Do request.SetHeader("Authorization",auth)
+        Do ..ApplyInboundAuth(request)
         Set sc = request.Get(found.swagger)
         If $$$ISERR(sc) {
-            // Do not expose IRIS status text, network details, or internal paths
-            // to the browser. The HTTP status and stable error code are enough
-            // for callers; server-side diagnostics remain available in IRIS.
             Set %response.Status = "502 Bad Gateway"
             Write {"error":"openapi_fetch_failed"}.%ToJSON()
             Quit $$$OK
@@ -148,8 +157,7 @@ ClassMethod RequestGET() As %Status
         Quit $$$OK
     }
 
-    Set auth = ..AuthHeader()
-    Set found = ..CatalogueService(service,auth)
+    Set found = ..CatalogueService(service)
     If '$IsObject(found) {
         Set %response.Status = "404 Not Found"
         Write {"error":"service_not_found","service":(service)}.%ToJSON()
@@ -170,7 +178,7 @@ ClassMethod RequestGET() As %Status
         Set request.Port = ..LocalPort()
         Set request.Timeout = 15
         Do request.SetHeader("Accept","application/json")
-        If auth'="" Do request.SetHeader("Authorization",auth)
+        Do ..ApplyInboundAuth(request)
         Set sc = request.Get(target)
         If $$$ISERR(sc) {
             Set %response.Status = "502 Bad Gateway"
