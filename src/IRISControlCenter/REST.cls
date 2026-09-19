@@ -163,6 +163,13 @@ ClassMethod RequestGET() As %Status
         Write {"error":"service_not_found","service":(service)}.%ToJSON()
         Quit $$$OK
     }
+    // Discovery intentionally shows disabled applications so operators can see
+    // the complete IRIS catalogue, but Control Center must not execute them.
+    If found.enabled = 0 {
+        Set %response.Status = "409 Conflict"
+        Write {"error":"service_disabled","service":(service)}.%ToJSON()
+        Quit $$$OK
+    }
     Set base = found.webApplication
     If (base="")!('..IsSafeRelativePath(base)) {
         Set %response.Status = "400 Bad Request"
