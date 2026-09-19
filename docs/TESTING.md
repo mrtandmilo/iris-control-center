@@ -41,13 +41,14 @@ READY_TIMEOUT=300 READY_INTERVAL=5 REQUEST_TIMEOUT=30 \
 
 `BASE_URL`, `IRIS_USER`, and `IRIS_PASSWORD` can also be overridden for a non-default local environment. Do not commit real credentials.
 
-A successful run verifies the browser shell/assets, authenticated health response, JSON response contracts, service discovery, OpenAPI error isolation, request-proxy validation, and traversal protections. A timeout or failed assertion is a release-gate failure and must not be treated as a successful runtime validation.
+A successful run verifies the browser shell/assets, rejects unauthenticated API access, validates the authenticated health response and JSON contracts, exercises service discovery, and checks OpenAPI/request-proxy validation, isolation and traversal protections. A timeout or failed assertion is a release-gate failure and must not be treated as a successful runtime validation.
 
 ## API smoke tests
 
 With an authenticated IRIS session, verify:
 
-- `GET /iris-control-center/api/health` returns HTTP 200, `status: ok`, the application name and namespace.
+- An unauthenticated `GET /iris-control-center/api/health` is rejected with HTTP 401; the static UI may load without authentication, but management data must not be exposed before IRIS authenticates the API request.
+- `GET /iris-control-center/api/health` returns HTTP 200, `status: ok`, the application name and namespace when authenticated.
 - `GET /iris-control-center/api/services` returns HTTP 200 and a JSON object containing `services`, `source` and `count`.
 - The service catalogue contains both generated REST applications and eligible manually configured REST applications present in the instance.
 - A known service with an advertised Swagger/OpenAPI definition can be retrieved with `GET /iris-control-center/api/openapi?service=<encoded service name>`.
@@ -73,6 +74,7 @@ With an authenticated IRIS session, verify:
 ## Security regression checks
 
 - No credentials, authorization headers or session tokens appear in repository files or browser local/session storage.
+- Unauthenticated requests to the management API are rejected before application data is returned.
 - The request workbench cannot supply an arbitrary remote host; its base path comes from the selected discovered service.
 - Discovery and OpenAPI retrieval respect IRIS authentication/authorization.
 - Mutating operations cannot be launched from the browser UI.
