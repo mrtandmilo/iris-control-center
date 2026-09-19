@@ -69,7 +69,14 @@ The main application flow is implemented: installation, service discovery, OpenA
 
 ## Contest
 
-Submission deadline: September 27, 2026 (23:59 EST). The contest permits continued improvements during the voting period.
+The official contest runs September 14–October 4, 2026, but **new submissions close September 27, 2026 at 23:59 EST**. Community voting runs September 28–October 4, and submitted applications may continue to be improved during voting.
+
+The contest scores Complexity, Clarity of Instructions, Developer Experience, Applicability and Usability. IRIS Control Center already uses a Docker container, which is one of the announced technology-bonus categories. Other bonus opportunities (such as IPM packaging, an online demo and a YouTube demo) are treated as optional release enhancements and are not claimed until they are actually delivered.
+
+Official references:
+
+- [Contest page](https://openexchange.intersystems.com/contest/48)
+- [Developer Community announcement](https://community.intersystems.com/post/intersystems-programming-contest-build-your-own-management-portal)
 
 ## License
 
