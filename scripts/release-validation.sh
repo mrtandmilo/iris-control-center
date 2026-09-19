@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Always operate on this checkout, regardless of the caller's current working
+# directory. This prevents docker compose from selecting an unrelated project
+# and makes the documented ./scripts/release-validation.sh command reliable
+# when invoked through an absolute path or from automation.
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
+cd "$REPO_ROOT"
+
 : "${IRIS_IMAGE:?Set IRIS_IMAGE to the exact IRIS Community image tag used for release validation}"
 : "${IRIS_PASSWORD:?Set IRIS_PASSWORD before running release validation}"
 
