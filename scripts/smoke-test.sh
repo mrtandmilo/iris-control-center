@@ -73,30 +73,38 @@ expect_json_error() {
   local expected_error="$2"
   local url="$3"
   local body_file
+  local headers_file
   local status
   local content_type
   body_file="$(mktemp)"
-  trap 'rm -f "$body_file"' RETURN
+  headers_file="$(mktemp)"
+
+  # One request must prove status, content type and body contract together. Apart
+  # from making the smoke suite faster, this avoids masking state-sensitive
+  # behaviour by issuing the same request twice.
   status="$(curl --silent --show-error --max-time "$REQUEST_TIMEOUT" --user "$USER:$PASS" \
-    --output "$body_file" --write-out '%{http_code}' --header 'Accept: application/json' "$url")"
-  content_type="$(curl --silent --show-error --max-time "$REQUEST_TIMEOUT" --user "$USER:$PASS" \
-    --output /dev/null --write-out '%{content_type}' --header 'Accept: application/json' "$url")"
+    --dump-header "$headers_file" --output "$body_file" --write-out '%{http_code}' \
+    --header 'Accept: application/json' "$url")"
+  content_type="$(awk 'BEGIN { IGNORECASE=1 } /^Content-Type:/ { value=$0; sub(/^[^:]*:[[:space:]]*/, "", value); sub(/\r$/, "", value); result=value } END { print result }' "$headers_file")"
+
   if [[ "$status" != "$expected_status" ]]; then
     echo "Expected HTTP $expected_status from $url, got $status" >&2
     cat "$body_file" >&2
+    rm -f "$body_file" "$headers_file"
     exit 1
   fi
   if [[ "$content_type" != application/json* ]]; then
     echo "Expected JSON content type from $url, got '$content_type'" >&2
+    rm -f "$body_file" "$headers_file"
     exit 1
   fi
   if ! grep -q "\"error\":\"$expected_error\"" "$body_file"; then
     echo "Expected error code '$expected_error' from $url, got:" >&2
     cat "$body_file" >&2
+    rm -f "$body_file" "$headers_file"
     exit 1
   fi
-  rm -f "$body_file"
-  trap - RETURN
+  rm -f "$body_file" "$headers_file"
 }
 
 wait_for_control_center() {
