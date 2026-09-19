@@ -46,15 +46,15 @@ printf 'Validation UTC: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo 'Removing disposable validation stack and data volume...'
 docker compose down -v --remove-orphans
 
-echo 'Building from scratch against the current pinned base image...'
-# --pull ensures the explicit release tag is resolved afresh instead of silently
-# validating an older local copy of a mutable registry tag. We record the image
-# ID below as immutable evidence of the exact base bytes used by this run.
-docker compose build --pull --no-cache
+echo 'Pulling the pinned IRIS base image...'
+# Pull explicitly before the BuildKit build. BuildKit may otherwise resolve a
+# base only into its private cache, in which case `docker image inspect` cannot
+# reliably produce release evidence for that tag even though the build worked.
+docker pull "$IRIS_IMAGE"
 
 base_image_id="$(docker image inspect --format '{{.Id}}' "$IRIS_IMAGE" 2>/dev/null || true)"
 if [[ -z "$base_image_id" ]]; then
-  echo "Unable to resolve the built IRIS base image ID for $IRIS_IMAGE." >&2
+  echo "Unable to resolve the pulled IRIS base image ID for $IRIS_IMAGE." >&2
   exit 1
 fi
 printf 'IRIS base image ID: %s\n' "$base_image_id"
@@ -65,6 +65,11 @@ if [[ -n "$base_repo_digests" ]]; then
 else
   echo 'IRIS base repository digest(s): unavailable; image ID above is the immutable local evidence.'
 fi
+
+echo 'Building from scratch against the freshly pulled pinned base image...'
+# Keep --pull as a defense-in-depth registry check immediately before the build;
+# --no-cache ensures no application layer from an earlier run is reused.
+docker compose build --pull --no-cache
 
 echo 'Starting IRIS...'
 docker compose up -d
