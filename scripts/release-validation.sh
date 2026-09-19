@@ -43,13 +43,10 @@ printf 'Release validation image tag: %s\n' "$IRIS_IMAGE"
 printf 'Git commit: %s\n' "$(git rev-parse HEAD)"
 printf 'Validation UTC: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
-echo 'Removing disposable validation stack and data volume...'
-docker compose down -v --remove-orphans
-
 echo 'Pulling the pinned IRIS base image...'
-# Pull explicitly before the BuildKit build. BuildKit may otherwise resolve a
-# base only into its private cache, in which case `docker image inspect` cannot
-# reliably produce release evidence for that tag even though the build worked.
+# Resolve the external prerequisite before touching the existing local stack.
+# A typo, expired registry login, or unavailable tag must not destroy a useful
+# running environment merely because release validation was attempted.
 docker pull "$IRIS_IMAGE"
 
 base_image_id="$(docker image inspect --format '{{.Id}}' "$IRIS_IMAGE" 2>/dev/null || true)"
@@ -65,6 +62,9 @@ if [[ -n "$base_repo_digests" ]]; then
 else
   echo 'IRIS base repository digest(s): unavailable; image ID above is the immutable local evidence.'
 fi
+
+echo 'Removing disposable validation stack and data volume...'
+docker compose down -v --remove-orphans
 
 echo 'Building from scratch against the freshly pulled pinned base image...'
 # Keep --pull as a defense-in-depth registry check immediately before the build;
