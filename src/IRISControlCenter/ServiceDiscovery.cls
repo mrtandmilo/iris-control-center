@@ -14,15 +14,20 @@ ClassMethod GetCatalogue(authHeader As %String = "") As %DynamicObject
         Set request.Server = "127.0.0.1"
         Set request.Port = $Select($Get(^%SYS("WebServer","Port"))'="":$Get(^%SYS("WebServer","Port")),1:52773)
         Set request.Https = 0
+        Set request.Timeout = 15
         If authHeader'="" Do request.SetHeader("Authorization",authHeader)
         Set sc = request.Get("/api/mgmnt/")
         If $$$ISERR(sc) {
-            Set result.error = $System.Status.GetErrorText(sc)
+            // Keep transport and IRIS status details out of the browser-facing
+            // catalogue. Stable error codes are sufficient for the UI while
+            // avoiding accidental disclosure of local paths or diagnostics.
+            Set result.error = "service_discovery_failed"
             Quit result
         }
 
         If request.HttpResponse.StatusCode '= 200 {
-            Set result.error = "IRIS management API returned HTTP "_request.HttpResponse.StatusCode
+            Set result.error = "service_discovery_failed"
+            Set result.upstreamStatus = request.HttpResponse.StatusCode
             Quit result
         }
 
@@ -43,7 +48,7 @@ ClassMethod GetCatalogue(authHeader As %String = "") As %DynamicObject
         }
         Set result.count = result.services.%Size()
     } Catch ex {
-        Set result.error = ex.DisplayString()
+        Set result.error = "service_discovery_failed"
     }
 
     Quit result
