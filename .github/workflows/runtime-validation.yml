@@ -1,0 +1,45 @@
+name: IRIS runtime acceptance
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: iris-runtime-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Keep CI on the same immutable Community image used by Compose. The
+      # digest prevents a registry tag update from silently changing the runtime
+      # under test.
+      IRIS_IMAGE: intersystems/iris-community:2026.1@sha256:c57b65b2b454494091e7b3e49f6a53b3335f40adf475bcfcee0866083f35a7c2
+      # A run-specific throwaway credential avoids storing a repository secret.
+      # It exists only inside the disposable CI instance.
+      IRIS_PASSWORD: ${{ format('CI-{0}-Aa1!', github.run_id) }}
+      CONTAINER_HEALTH_TIMEOUT: 300
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Run clean release validation
+        run: ./scripts/release-validation.sh
+
+      - name: Capture container diagnostics on failure
+        if: failure()
+        run: |
+          docker compose ps || true
+          docker compose logs --no-color iris || true
+
+      - name: Tear down disposable runtime
+        if: always()
+        run: docker compose down -v --remove-orphans || true
