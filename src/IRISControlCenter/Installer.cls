@@ -19,7 +19,9 @@ ClassMethod Setup() As %Status
         Set ui.Description = "IRIS Control Center"
         Set ui.NameSpace = appNamespace
         Set ui.Enabled = 1
-        Set ui.Path = "/home/irisowner/dev/web"
+        // Static files served by the IRIS private web server belong under the
+        // installation CSP document tree. The Docker image copies the UI here.
+        Set ui.Path = "/usr/irissys/csp/iris-control-center"
         Set ui.ServeFiles = 1
         Set ui.Recurse = 1
         Set ui.AutheEnabled = 64
