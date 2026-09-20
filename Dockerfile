@@ -7,6 +7,11 @@ COPY src ./src
 COPY web ./web
 COPY iris.script ./iris.script
 
+# Seed the named-volume mountpoint with irisowner ownership. Docker copies these
+# permissions into a newly created volume, allowing ISC_DATA_DIRECTORY to
+# initialize without requiring a privileged container entrypoint.
+RUN mkdir -p /home/irisowner/irisdata
+
 RUN iris start IRIS && \
     iris session IRIS < iris.script && \
     iris stop IRIS quietly
