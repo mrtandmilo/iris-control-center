@@ -19,7 +19,7 @@ ClassMethod Setup() As %Status
         Set ui.Recurse = 1
         Set ui.AutheEnabled = 64
         Set sc = ui.%Save()
-        Quit:$$$ISERR(sc) sc
+        If $$$ISERR(sc) $$$ThrowStatus(sc)
 
         // API is kept separate from static files so its dispatch class receives
         // only API traffic. Password authentication is used by default.
