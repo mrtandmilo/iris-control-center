@@ -5,6 +5,10 @@ WORKDIR /home/irisowner/dev
 
 COPY src ./src
 COPY web ./web
+# The private web server resolves CSP application physical paths from the IRIS
+# CSP document tree. Keep a build-time copy there so static UI requests are
+# handled by the same supported path model as native IRIS web applications.
+COPY web /usr/irissys/csp/iris-control-center
 COPY iris.script ./iris.script
 COPY scripts/container-entrypoint.sh ./scripts/container-entrypoint.sh
 
