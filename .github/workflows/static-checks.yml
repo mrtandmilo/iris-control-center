@@ -82,7 +82,10 @@ jobs:
         run: |
           set -euo pipefail
           pattern='authorization:[[:space:]]*(basic|bearer)[[:space:]]+[A-Za-z0-9+/_.=-]{8,}|password[[:space:]]*[:=][[:space:]]*[^$[:space:]][^[:space:]]{5,}'
-          if git grep -nEi "$pattern" -- ':!docs/*' ':!scripts/smoke-test.sh'; then
+          # Exclude documentation, smoke-test fixtures, and this workflow itself:
+          # the fail-fast tests above intentionally contain an obvious dummy
+          # password assignment, which must not make the secret scanner fail.
+          if git grep -nEi "$pattern" -- ':!docs/*' ':!scripts/smoke-test.sh' ':!.github/workflows/static-checks.yml'; then
             echo 'Potential hard-coded credential found.' >&2
             exit 1
           fi
