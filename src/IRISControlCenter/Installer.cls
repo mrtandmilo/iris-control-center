@@ -17,7 +17,7 @@ ClassMethod Setup() As %Status
             Set ui.Name = "/iris-control-center"
         }
         Set ui.Description = "IRIS Control Center"
-        Set ui.Namespace = appNamespace
+        Set ui.NameSpace = appNamespace
         Set ui.Enabled = 1
         Set ui.Path = "/home/irisowner/dev/web"
         Set ui.ServeFiles = 1
@@ -32,7 +32,7 @@ ClassMethod Setup() As %Status
             Set api.Name = "/iris-control-center/api"
         }
         Set api.Description = "IRIS Control Center API"
-        Set api.Namespace = appNamespace
+        Set api.NameSpace = appNamespace
         Set api.Enabled = 1
         Set api.DispatchClass = "IRISControlCenter.REST"
         Set api.MatchRoles = ""
