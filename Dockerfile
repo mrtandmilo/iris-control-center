@@ -1,4 +1,4 @@
-ARG IMAGE=containers.intersystems.com/intersystems/iris-community:latest-em
+ARG IMAGE=containers.intersystems.com/intersystems/iris-community:2026.1
 FROM $IMAGE
 
 WORKDIR /home/irisowner/dev
