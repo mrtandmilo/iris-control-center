@@ -6,6 +6,7 @@ WORKDIR /home/irisowner/dev
 COPY src ./src
 COPY web ./web
 COPY iris.script ./iris.script
+COPY scripts/container-entrypoint.sh ./scripts/container-entrypoint.sh
 
 # Seed the named-volume mountpoint with irisowner ownership. Docker copies these
 # permissions into a newly created volume, allowing ISC_DATA_DIRECTORY to
@@ -15,3 +16,8 @@ RUN mkdir -p /home/irisowner/irisdata
 RUN iris start IRIS && \
     iris session IRIS < iris.script && \
     iris stop IRIS quietly
+
+# Run through bash rather than relying on the source file's executable bit; the
+# GitHub contents API may create text files as 0644. The wrapper delegates to
+# the vendor iris-main entrypoint after creating its one-use password file.
+ENTRYPOINT ["/bin/bash", "/home/irisowner/dev/scripts/container-entrypoint.sh"]
