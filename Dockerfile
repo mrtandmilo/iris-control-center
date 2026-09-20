@@ -8,12 +8,10 @@ COPY web ./web
 COPY iris.script ./iris.script
 COPY scripts/container-entrypoint.sh ./scripts/container-entrypoint.sh
 
-# Seed the named-volume mountpoint with irisowner ownership. Docker copies these
-# permissions and contents into a newly created volume. The private web server's
-# CSP tree is relocated under ISC_DATA_DIRECTORY at first startup, so expose the
-# immutable UI there with a symlink back to the application files in the image.
-RUN mkdir -p /home/irisowner/irisdata/csp && \
-    ln -s /home/irisowner/dev/web /home/irisowner/irisdata/csp/iris-control-center
+# Create only the named-volume mountpoint. Keep it empty so iris-main can
+# initialize ISC_DATA_DIRECTORY atomically on first startup.
+RUN mkdir -p /home/irisowner/irisdata && \
+    chown irisowner:irisowner /home/irisowner/irisdata
 
 RUN iris start IRIS && \
     iris session IRIS < iris.script && \
