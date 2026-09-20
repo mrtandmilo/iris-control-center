@@ -36,7 +36,10 @@ const requiredFragments = [
   ["body.slice(0,12000)", 'Explorer response rendering no longer enforces the browser output cap.'],
   ["ref.startsWith('#/')", 'Explorer no longer recognizes local OpenAPI/Swagger references.'],
   ["replace(/~1/g,'/').replace(/~0/g,'~')", 'Explorer no longer decodes JSON Pointer tokens in local references.'],
-  ["resolveParam(spec,raw)", 'Explorer no longer resolves referenced path/operation parameters before rendering.']
+  ["resolveParam(spec,raw)", 'Explorer no longer resolves referenced path/operation parameters before rendering.'],
+  ["Array.isArray(schema.enum)&&schema.enum.length", 'Explorer no longer recognizes enumerated parameter choices.'],
+  ["<select ${attrs}>", 'Explorer no longer renders enumerated parameters as constrained controls.'],
+  ["— not set —", 'Optional enum parameters no longer provide an explicit omitted state.']
 ];
 
 for (const [fragment, message] of requiredFragments) {
