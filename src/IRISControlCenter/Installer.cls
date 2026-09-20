@@ -19,10 +19,9 @@ ClassMethod Setup() As %Status
         Set ui.Description = "IRIS Control Center"
         Set ui.NameSpace = appNamespace
         Set ui.Enabled = 1
-        // iris-main relocates the private web server CSP tree beneath the
-        // persistent ISC_DATA_DIRECTORY. The image seeds this path with a
-        // symlink to the immutable UI files before the volume is initialized.
-        Set ui.Path = "/home/irisowner/irisdata/csp/iris-control-center"
+        // Keep static assets outside ISC_DATA_DIRECTORY. The persistent data
+        // directory must remain empty until iris-main initializes it.
+        Set ui.Path = "/home/irisowner/dev/web"
         Set ui.ServeFiles = 1
         Set ui.Recurse = 1
         Set ui.AutheEnabled = 64
