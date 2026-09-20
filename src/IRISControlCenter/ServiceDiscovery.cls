@@ -44,9 +44,12 @@ ClassMethod GetCatalogue(authHeader As %String = "", cookieHeader As %String = "
                 "dispatchClass":($Get(service.dispatchClass)),
                 "namespace":($Get(service.namespace)),
                 "resource":($Get(service.resource)),
-                "enabled":($Get(service.enabled)),
                 "swagger":($Get(service.swaggerSpec))
             }
+            // The management API may represent Enabled as numeric 0/1. Force
+            // the normalized catalogue contract to a real JSON boolean so the
+            // browser can reliably distinguish disabled applications.
+            Do item.%Set("enabled",($Get(service.enabled)=1),"boolean")
             Do result.services.%Push(item)
         }
         Set result.count = result.services.%Size()
