@@ -4,7 +4,7 @@ IRIS Control Center is intentionally tested as an installed IRIS application, no
 
 ## Build and installation
 
-For day-to-day development the Compose build defaults to `containers.intersystems.com/intersystems/iris-community:latest-em`. For final release validation, pin the exact IRIS Community image tag so the evidence is reproducible.
+The repository defaults to the IRIS Community 2026.1 image pinned by manifest digest in both `Dockerfile` and `docker-compose.yml`. The digest is part of the release configuration so a clean validation does not silently move to a later maintenance image.
 
 First remove the existing Compose stack **and its named data volume**. A no-cache image build alone is not a clean IRIS installation because `iris-data` persists between runs:
 
@@ -14,19 +14,18 @@ docker compose down -v --remove-orphans
 
 This command deletes the local IRIS data volume for this Compose project. Use it only for the disposable contest-validation instance, never for an IRIS instance containing data that must be retained.
 
-Then build and start with the same pinned image tag:
+Then build and start using the repository's immutable default:
 
 ```bash
-export IRIS_IMAGE=containers.intersystems.com/intersystems/iris-community:<exact-tag>
-docker compose build --no-cache
+docker compose build --pull --no-cache
 docker compose up
 ```
 
-Do not use the literal `<exact-tag>` placeholder; replace it with the tested Community image tag available from the InterSystems container registry. Record that tag with the release evidence. Keeping `IRIS_IMAGE` exported for both commands also prevents the build and runtime steps from accidentally resolving different defaults.
+`IRIS_IMAGE` may be exported to validate a different explicit IRIS Community release, but release evidence must record the exact tag/digest used. Do not use a moving `latest` tag.
 
 1. Remove the disposable validation stack and `iris-data` volume with `docker compose down -v --remove-orphans`.
-2. Export the exact IRIS Community image tag and run the no-cache build above.
-3. Start the pinned Compose stack and wait for IRIS to report healthy.
+2. Run the no-cache build above against the pinned image.
+3. Start the Compose stack and wait for IRIS to report healthy.
 4. Confirm the setup script imports all classes without compile errors.
 5. Confirm `/iris-control-center` and `/iris-control-center/api` exist as enabled web applications.
 6. Open `http://localhost:52773/iris-control-center/`.
@@ -52,6 +51,20 @@ READY_TIMEOUT=300 READY_INTERVAL=5 REQUEST_TIMEOUT=30 \
 `BASE_URL`, `IRIS_USER`, and `IRIS_PASSWORD` can also be overridden for a non-default local environment. Do not commit real credentials.
 
 A successful run verifies the browser shell/assets, rejects unauthenticated API access, validates the authenticated health response and JSON contracts, exercises service discovery, and checks OpenAPI/request-proxy validation, isolation and traversal protections. A timeout or failed assertion is a release-gate failure and must not be treated as a successful runtime validation.
+
+## One-command release validation
+
+For the final clean acceptance run, use the release-validation wrapper. It requires a clean Git worktree and an explicit password, records the commit and resolved base-image evidence, removes the disposable data volume, rebuilds without cache, waits for container health and runs the smoke suite:
+
+```bash
+read -rs -p 'IRIS password: ' IRIS_PASSWORD; echo
+export IRIS_PASSWORD
+export IRIS_IMAGE='intersystems/iris-community:2026.1@sha256:c57b65b2b454494091e7b3e49f6a53b3335f40adf475bcfcee0866083f35a7c2'
+./scripts/release-validation.sh
+unset IRIS_PASSWORD IRIS_IMAGE
+```
+
+Keep the successful transcript as release evidence. The validated stack is intentionally left running so browser screenshots and demo evidence can be captured from the same instance.
 
 ## API smoke tests
 
@@ -94,9 +107,9 @@ With an authenticated IRIS session, verify:
 
 Before contest submission, capture:
 
-- exact pinned IRIS Community image tag used for the final validation;
+- exact pinned IRIS Community image reference and resolved digest used for final validation;
 - confirmation that the disposable validation data volume was removed before the build;
-- successful clean container build output using that pinned tag;
+- successful clean container build output;
 - successful ObjectScript compile/setup output;
 - successful `scripts/smoke-test.sh` output;
 - health endpoint response;
