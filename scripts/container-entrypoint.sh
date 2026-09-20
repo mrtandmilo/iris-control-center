@@ -11,7 +11,9 @@ fi
 
 password_file="$(mktemp /tmp/iris-password.XXXXXX)"
 chmod 600 "$password_file"
-printf '%s' "$IRIS_PASSWORD" > "$password_file"
+# changePassword.sh reads the password as a text line. Terminate it with a
+# newline so command-line readers do not block waiting for the end of the line.
+printf '%s\n' "$IRIS_PASSWORD" > "$password_file"
 unset IRIS_PASSWORD
 
 exec /iris-main --password-file "$password_file" --check-caps false
