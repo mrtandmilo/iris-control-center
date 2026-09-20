@@ -25,34 +25,30 @@ ClassMethod GetCatalogue(authHeader As %String = "", cookieHeader As %String = "
             // catalogue. Stable error codes are sufficient for the UI while
             // avoiding accidental disclosure of local paths or diagnostics.
             Set result.error = "service_discovery_failed"
-            Quit result
-        }
-
-        If request.HttpResponse.StatusCode '= 200 {
+        } ElseIf request.HttpResponse.StatusCode '= 200 {
             Set result.error = "service_discovery_failed"
             Set result.upstreamStatus = request.HttpResponse.StatusCode
-            Quit result
-        }
-
-        Set raw = [].%FromJSON(request.HttpResponse.Data)
-        Set iter = raw.%GetIterator()
-        While iter.%GetNext(.key,.service) {
-            If '$IsObject(service) Continue
-            Set item = {
-                "name":($Get(service.name)),
-                "webApplication":($Get(service.name)),
-                "dispatchClass":($Get(service.dispatchClass)),
-                "namespace":($Get(service.namespace)),
-                "resource":($Get(service.resource)),
-                "swagger":($Get(service.swaggerSpec))
+        } Else {
+            Set raw = [].%FromJSON(request.HttpResponse.Data)
+            Set iter = raw.%GetIterator()
+            While iter.%GetNext(.key,.service) {
+                If '$IsObject(service) Continue
+                Set item = {
+                    "name":($Get(service.name)),
+                    "webApplication":($Get(service.name)),
+                    "dispatchClass":($Get(service.dispatchClass)),
+                    "namespace":($Get(service.namespace)),
+                    "resource":($Get(service.resource)),
+                    "swagger":($Get(service.swaggerSpec))
+                }
+                // The management API may represent Enabled as numeric 0/1. Force
+                // the normalized catalogue contract to a real JSON boolean so the
+                // browser can reliably distinguish disabled applications.
+                Do item.%Set("enabled",($Get(service.enabled)=1),"boolean")
+                Do result.services.%Push(item)
             }
-            // The management API may represent Enabled as numeric 0/1. Force
-            // the normalized catalogue contract to a real JSON boolean so the
-            // browser can reliably distinguish disabled applications.
-            Do item.%Set("enabled",($Get(service.enabled)=1),"boolean")
-            Do result.services.%Push(item)
+            Set result.count = result.services.%Size()
         }
-        Set result.count = result.services.%Size()
     } Catch ex {
         Set result.error = "service_discovery_failed"
     }
