@@ -52,9 +52,6 @@ ClassMethod IsSafeRelativePath(path As %String) As %Boolean [ Private ]
     If $Extract(path,1)'="/" Quit 0
     Set lower = $ZConvert(path,"L")
     If (lower["://")!(lower["\\") Quit 0
-    // Keep the proxy pinned beneath the selected IRIS web application. Reject
-    // literal, encoded, and double-encoded dot segments before the upstream
-    // server gets an opportunity to normalize or decode them again.
     Set pathname = $Piece(lower,"?",1)
     If (pathname="/..")!(pathname["/../")!($Extract(pathname,$Length(pathname)-2,*)="/..") Quit 0
     If (pathname["%2e%2e")!(pathname["%2e.")!(pathname[".%2e") Quit 0
@@ -95,7 +92,6 @@ ClassMethod OpenAPI() As %Status
         Write {"error":"service_required"}.%ToJSON()
         Quit $$$OK
     }
-
     Set found = ..CatalogueService(service)
     If '$IsObject(found) {
         Set %response.Status = "404 Not Found"
@@ -107,8 +103,6 @@ ClassMethod OpenAPI() As %Status
         Write {"error":"openapi_not_available","service":(service)}.%ToJSON()
         Quit $$$OK
     }
-    // Management metadata is not allowed to turn this endpoint into a generic
-    // HTTP fetcher. Specifications must be local IRIS-relative paths.
     If '..IsSafeRelativePath(found.swagger) {
         Set %response.Status = "502 Bad Gateway"
         Write {"error":"invalid_openapi_location","service":(service)}.%ToJSON()
@@ -125,15 +119,13 @@ ClassMethod OpenAPI() As %Status
         If $$$ISERR(sc) {
             Set %response.Status = "502 Bad Gateway"
             Write {"error":"openapi_fetch_failed"}.%ToJSON()
-            Quit $$$OK
-        }
-        If request.HttpResponse.StatusCode '= 200 {
+        } ElseIf request.HttpResponse.StatusCode '= 200 {
             Set %response.Status = "502 Bad Gateway"
             Write {"error":"openapi_fetch_failed","upstreamStatus":(request.HttpResponse.StatusCode)}.%ToJSON()
-            Quit $$$OK
+        } Else {
+            If request.HttpResponse.ContentType'="" Set %response.ContentType = request.HttpResponse.ContentType
+            Do ..WriteStream(request.HttpResponse.Data)
         }
-        If request.HttpResponse.ContentType'="" Set %response.ContentType = request.HttpResponse.ContentType
-        Do ..WriteStream(request.HttpResponse.Data)
     } Catch ex {
         Set %response.Status = "502 Bad Gateway"
         Write {"error":"openapi_fetch_failed"}.%ToJSON()
@@ -156,15 +148,12 @@ ClassMethod RequestGET() As %Status
         Write {"error":"invalid_path"}.%ToJSON()
         Quit $$$OK
     }
-
     Set found = ..CatalogueService(service)
     If '$IsObject(found) {
         Set %response.Status = "404 Not Found"
         Write {"error":"service_not_found","service":(service)}.%ToJSON()
         Quit $$$OK
     }
-    // Discovery intentionally shows disabled applications so operators can see
-    // the complete IRIS catalogue, but Control Center must not execute them.
     If found.enabled = 0 {
         Set %response.Status = "409 Conflict"
         Write {"error":"service_disabled","service":(service)}.%ToJSON()
@@ -190,12 +179,12 @@ ClassMethod RequestGET() As %Status
         If $$$ISERR(sc) {
             Set %response.Status = "502 Bad Gateway"
             Write {"error":"request_failed"}.%ToJSON()
-            Quit $$$OK
+        } Else {
+            Set upstream = request.HttpResponse
+            Set %response.Status = upstream.StatusCode_" "_upstream.ReasonPhrase
+            If upstream.ContentType'="" Set %response.ContentType = upstream.ContentType
+            Do ..WriteStream(upstream.Data)
         }
-        Set upstream = request.HttpResponse
-        Set %response.Status = upstream.StatusCode_" "_upstream.ReasonPhrase
-        If upstream.ContentType'="" Set %response.ContentType = upstream.ContentType
-        Do ..WriteStream(upstream.Data)
     } Catch ex {
         Set %response.Status = "502 Bad Gateway"
         Write {"error":"request_failed"}.%ToJSON()
