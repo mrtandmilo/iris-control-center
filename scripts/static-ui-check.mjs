@@ -33,7 +33,10 @@ const requiredFragments = [
   ["/\\{[^}]+\\}/.test(path)", 'Explorer no longer blocks unresolved path parameters.'],
   ["!path.startsWith('/')", 'Explorer no longer rejects non-relative OpenAPI paths.'],
   ["ev.target.disabled=true", 'Explorer no longer suppresses duplicate execution while a request is in flight.'],
-  ["body.slice(0,12000)", 'Explorer response rendering no longer enforces the browser output cap.']
+  ["body.slice(0,12000)", 'Explorer response rendering no longer enforces the browser output cap.'],
+  ["ref.startsWith('#/')", 'Explorer no longer recognizes local OpenAPI/Swagger references.'],
+  ["replace(/~1/g,'/').replace(/~0/g,'~')", 'Explorer no longer decodes JSON Pointer tokens in local references.'],
+  ["resolveParam(spec,raw)", 'Explorer no longer resolves referenced path/operation parameters before rendering.']
 ];
 
 for (const [fragment, message] of requiredFragments) {
