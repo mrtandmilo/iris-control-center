@@ -21,9 +21,10 @@ services:
     command: --check-caps false
     healthcheck:
       # `iris status` exits non-zero when IRIS is running with a warning (for
-      # example the Community image's normal startup alert).  qlist reports the
+      # example the Community image's normal startup alert). qlist reports the
       # actual instance state without treating that warning as a failed runtime.
-      test: ["CMD-SHELL", "iris qlist IRIS 2>/dev/null | grep -q '\^running,'"]
+      # Use YAML single quotes so the regex backslash is passed through literally.
+      test: ['CMD-SHELL', 'iris qlist IRIS 2>/dev/null | grep -q ''\^running,''']
       interval: 5s
       timeout: 10s
       retries: 24
