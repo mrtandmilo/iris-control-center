@@ -4,15 +4,20 @@ Class IRISControlCenter.Installer
 ClassMethod Setup() As %Status
 {
     Set sc = $$$OK
+    Set appNamespace = $Namespace
+    Set originalNamespace = $Namespace
     Try {
-        // Static browser application.
+        // Security.Applications is stored in %SYS rather than application
+        // namespaces. Preserve USER as the namespace assigned to both apps.
+        ZN "%SYS"
+
         Set ui = ##class(Security.Applications).%OpenId("/iris-control-center")
         If '$IsObject(ui) {
             Set ui = ##class(Security.Applications).%New()
             Set ui.Name = "/iris-control-center"
         }
         Set ui.Description = "IRIS Control Center"
-        Set ui.Namespace = $Namespace
+        Set ui.Namespace = appNamespace
         Set ui.Enabled = 1
         Set ui.Path = "/home/irisowner/dev/web"
         Set ui.ServeFiles = 1
@@ -21,15 +26,13 @@ ClassMethod Setup() As %Status
         Set sc = ui.%Save()
         If $$$ISERR(sc) $$$ThrowStatus(sc)
 
-        // API is kept separate from static files so its dispatch class receives
-        // only API traffic. Password authentication is used by default.
         Set api = ##class(Security.Applications).%OpenId("/iris-control-center/api")
         If '$IsObject(api) {
             Set api = ##class(Security.Applications).%New()
             Set api.Name = "/iris-control-center/api"
         }
         Set api.Description = "IRIS Control Center API"
-        Set api.Namespace = $Namespace
+        Set api.Namespace = appNamespace
         Set api.Enabled = 1
         Set api.DispatchClass = "IRISControlCenter.REST"
         Set api.MatchRoles = ""
@@ -38,6 +41,7 @@ ClassMethod Setup() As %Status
     } Catch ex {
         Set sc = ex.AsStatus()
     }
+    ZN originalNamespace
     Quit sc
 }
 
