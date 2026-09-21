@@ -5,9 +5,10 @@ This record tracks the final contest release. Do not record passwords, tokens, c
 ## Environment
 
 - Validation date (UTC): 2026-09-21
-- Runtime-validated commit SHA: `b821bac13be54ceac491978d9633c692d57e9aac`
-- Current documentation descendants: `0b9c883`, `10be27e` (documentation-only changes after the validated runtime commit)
+- Runtime-validated commit SHA: `8fd52aa4bd59977822a548fb351f63467a1018de`
 - IRIS Community release: 2026.1
+- GitHub Actions runtime acceptance: **passed** (run 34)
+- GitHub Actions static checks: **passed** (run 108)
 - Host tooling/OS details: not retained in repository evidence; reproduce during final clean-checkout validation
 
 ## Clean build and installation
@@ -18,7 +19,7 @@ This record tracks the final contest release. Do not record passwords, tokens, c
 - [x] `/iris-control-center` was enabled and authenticated UI assets were delivered.
 - [x] `/iris-control-center/api` was enabled and authenticated API readiness passed.
 
-Evidence/notes: Clean runtime acceptance completed on `b821bac`. Earlier misleading green runs were rejected because build output still contained an ObjectScript compilation error; the recorded pass is the subsequent run after that compiler defect was fixed.
+Evidence/notes: The first fully clean runtime acceptance was established on `b821bac`. Subsequent documentation and accessibility hardening culminated in `8fd52aa`, whose runtime-acceptance and static-check workflows both completed successfully. Earlier misleading green runs were rejected because build output still contained an ObjectScript compilation error; those runs are not treated as release evidence.
 
 ## Automated runtime validation
 
@@ -31,7 +32,7 @@ Evidence/notes: Clean runtime acceptance completed on `b821bac`. Earlier mislead
 - [x] Unknown-service isolation passed.
 - [x] Authenticated UI, JavaScript and CSS delivery passed.
 
-Evidence/notes: The clean acceptance suite reached all 10 runtime checks successfully on IRIS Community 2026.1.
+Evidence/notes: The clean acceptance suite reaches all 10 runtime checks successfully on IRIS Community 2026.1. The latest validated application commit is `8fd52aa`.
 
 ## Browser acceptance
 
@@ -45,8 +46,9 @@ Evidence/notes: The clean acceptance suite reached all 10 runtime checks success
 - [ ] Response status, timing, headers and body render correctly.
 - [ ] Mutating methods remain inspect-only.
 - [ ] Refresh re-runs discovery without a page reload.
+- [ ] Keyboard navigation/focus and service-selection state verified in a real browser.
 
-Evidence/notes: Automated delivery and API behaviour are proven; visual/browser interaction remains a separate final acceptance gate and must not be inferred from HTTP smoke tests.
+Evidence/notes: Automated delivery, API behaviour and static accessibility contracts are proven; visual/browser interaction remains a separate final acceptance gate and must not be inferred from HTTP or source-level checks.
 
 ## Contest/demo evidence
 
@@ -63,8 +65,8 @@ Evidence/notes: The repository is currently private, so public-repository contes
 
 ## Release decision
 
-Runtime validation status: **PASSED on `b821bac` / IRIS Community 2026.1**
+Runtime validation status: **PASSED on `8fd52aa` / IRIS Community 2026.1**
 
 Contest-release status: **NOT YET READY FOR FINAL SUBMISSION**
 
-Remaining gates are browser/demo evidence, final clean-checkout/repository review, and public repository availability. Contest submission and acceptance of contest/legal terms remain owner actions.
+Remaining gates are real-browser/demo evidence, final clean-checkout/repository review, and public repository availability. Contest submission and acceptance of contest/legal terms remain owner actions.
