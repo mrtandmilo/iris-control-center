@@ -85,6 +85,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Match literal credential values, while allowing code that reads
+          # credentials from environment variables (for example
+          # process.env.IRIS_PASSWORD or ${IRIS_PASSWORD}). Requiring the
+          # assignment separator for password prevents property/env references
+          # from becoming false positives.
           pattern='authorization:[[:space:]]*(basic|bearer)[[:space:]]+[A-Za-z0-9+/_.=-]{8,}|password[[:space:]]*[:=][[:space:]]*[^$[:space:]][^[:space:]]{5,}'
           # Exclude documentation, smoke-test fixtures, and this workflow itself:
           # the fail-fast tests above intentionally contain an obvious dummy
