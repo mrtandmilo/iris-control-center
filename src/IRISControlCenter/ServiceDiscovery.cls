@@ -2,53 +2,48 @@ Class IRISControlCenter.ServiceDiscovery Extends %RegisteredObject
 {
 
 /// Return a normalized catalogue of REST-enabled web applications registered
-/// in the current IRIS instance. The legacy management endpoint is intentional:
-/// unlike /api/mgmnt/v2/, it includes both generated and manually-coded REST
-/// applications, which makes it the more complete discovery source for a portal.
-/// Forward both HTTP Authorization and Cookie because IRIS deployments may use
-/// either Basic authentication or an authenticated CSP session.
+/// in the current IRIS instance. Use the native %REST.API interface rather than
+/// making a loopback HTTP request to /api/mgmnt/. This preserves the documented
+/// discovery semantics (including manually-coded %CSP.REST applications) while
+/// avoiding a second authentication hop from an already-authenticated request.
 ClassMethod GetCatalogue(authHeader As %String = "", cookieHeader As %String = "") As %DynamicObject
 {
-    Set result = {"services":[],"source":"/api/mgmnt/","count":0}
+    Set result = {"services":[],"source":"%REST.API.GetAllWebRESTApps","count":0}
 
     Try {
-        Set request = ##class(%Net.HttpRequest).%New()
-        Set request.Server = "127.0.0.1"
-        Set request.Port = $Select($Get(^%SYS("WebServer","Port"))'="":$Get(^%SYS("WebServer","Port")),1:52773)
-        Set request.Https = 0
-        Set request.Timeout = 15
-        If authHeader'="" Do request.SetHeader("Authorization",authHeader)
-        If cookieHeader'="" Do request.SetHeader("Cookie",cookieHeader)
-        Set sc = request.Get("/api/mgmnt/")
+        Set sc = ##class(%REST.API).GetAllWebRESTApps(.appList)
         If $$$ISERR(sc) {
-            // Keep transport and IRIS status details out of the browser-facing
-            // catalogue. Stable error codes are sufficient for the UI while
-            // avoiding accidental disclosure of local paths or diagnostics.
             Set result.error = "service_discovery_failed"
-        } ElseIf request.HttpResponse.StatusCode '= 200 {
-            Set result.error = "service_discovery_failed"
-            Set result.upstreamStatus = request.HttpResponse.StatusCode
-        } Else {
-            Set raw = [].%FromJSON(request.HttpResponse.Data)
-            Set iter = raw.%GetIterator()
-            While iter.%GetNext(.key,.service) {
-                If '$IsObject(service) Continue
-                Set item = {
-                    "name":($Get(service.name)),
-                    "webApplication":($Get(service.name)),
-                    "dispatchClass":($Get(service.dispatchClass)),
-                    "namespace":($Get(service.namespace)),
-                    "resource":($Get(service.resource)),
-                    "swagger":($Get(service.swaggerSpec))
-                }
-                // The management API may represent Enabled as numeric 0/1. Force
-                // the normalized catalogue contract to a real JSON boolean so the
-                // browser can reliably distinguish disabled applications.
-                Do item.%Set("enabled",($Get(service.enabled)=1),"boolean")
-                Do result.services.%Push(item)
-            }
-            Set result.count = result.services.%Size()
+            Quit result
         }
+
+        For index=1:1:appList.Count() {
+            Set service = appList.GetAt(index)
+            If '$IsObject(service) Continue
+
+            // For web REST applications, name is the web application path.
+            // webApplications is populated by newer/spec-first applications;
+            // prefer it when present so request execution targets the deployed
+            // URL rather than an implementation/package name.
+            Set webApplication = service.webApplications
+            If webApplication="" Set webApplication=service.name
+            // A REST application can theoretically be deployed at multiple
+            // comma-separated paths. Use the first deployment for interactive
+            // execution while retaining the discovery name as the stable key.
+            If webApplication["," Set webApplication=$Piece(webApplication,",",1)
+
+            Set item = {
+                "name":(service.name),
+                "webApplication":(webApplication),
+                "dispatchClass":(service.dispatchClass),
+                "namespace":(service.namespace),
+                "resource":(service.resource),
+                "swagger":(service.swaggerSpec)
+            }
+            Do item.%Set("enabled",(service.enabled=1),"boolean")
+            Do result.services.%Push(item)
+        }
+        Set result.count = result.services.%Size()
     } Catch ex {
         Set result.error = "service_discovery_failed"
     }
