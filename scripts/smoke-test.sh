@@ -79,9 +79,6 @@ expect_json_error() {
   body_file="$(mktemp)"
   headers_file="$(mktemp)"
 
-  # One request must prove status, content type and body contract together. Apart
-  # from making the smoke suite faster, this avoids masking state-sensitive
-  # behaviour by issuing the same request twice.
   status="$(curl --silent --show-error --max-time "$REQUEST_TIMEOUT" --user "$USER:$PASS" \
     --dump-header "$headers_file" --output "$body_file" --write-out '%{http_code}' \
     --header 'Accept: application/json' "$url")"
@@ -130,12 +127,13 @@ wait_for_control_center() {
 
 wait_for_control_center
 
-echo "[1/10] Checking Control Center UI"
-curl --fail --silent --show-error --max-time "$REQUEST_TIMEOUT" "$BASE_URL/iris-control-center/" >/dev/null
+echo "[1/10] Checking Control Center UI authentication and dispatcher"
+expect_unauthenticated_status 401 "$BASE_URL/iris-control-center/"
+curl --fail --silent --show-error --max-time "$REQUEST_TIMEOUT" --user "$USER:$PASS" "$BASE_URL/iris-control-center/" >/dev/null
 
 echo "[2/10] Checking browser assets"
-curl --fail --silent --show-error --max-time "$REQUEST_TIMEOUT" "$BASE_URL/iris-control-center/app.js" >/dev/null
-curl --fail --silent --show-error --max-time "$REQUEST_TIMEOUT" "$BASE_URL/iris-control-center/app.css" >/dev/null
+curl --fail --silent --show-error --max-time "$REQUEST_TIMEOUT" --user "$USER:$PASS" "$BASE_URL/iris-control-center/app.js" >/dev/null
+curl --fail --silent --show-error --max-time "$REQUEST_TIMEOUT" --user "$USER:$PASS" "$BASE_URL/iris-control-center/app.css" >/dev/null
 
 echo "[3/10] Checking API authentication boundary"
 expect_unauthenticated_status 401 "$API/health"
