@@ -4,6 +4,8 @@ A focused, developer-friendly management console for InterSystems IRIS.
 
 Built for the 2026 InterSystems Programming Contest **Build Your Own Management Portal**.
 
+**Contest task / idea:** [Build Your Own Management Portal — manage web apps and explore REST APIs](https://community.intersystems.com/post/intersystems-programming-contest-build-your-own-management-portal)
+
 ## Why it exists
 
 IRIS Control Center makes REST service discovery and API exploration faster and clearer than moving between multiple management screens. The contest release focuses on **managing awareness of web apps and exploring REST APIs**: discover what is available, understand its contract, and safely exercise read-only operations from one screen.
@@ -77,12 +79,13 @@ The core contest workflow is implemented and runtime-tested against the pinned I
 
 The official contest runs September 14–October 4, 2026, but **new submissions close September 27, 2026 at 23:59 EST**. Community voting runs September 28–October 4, and submitted applications may continue to be improved during voting.
 
-The contest scores Complexity, Clarity of Instructions, Developer Experience, Applicability and Usability. IRIS Control Center uses a Docker container, one of the announced technology-bonus categories. Other bonus opportunities (such as IPM packaging, an online demo and a YouTube demo) are not claimed until they are actually delivered.
+The contest scores Complexity, Clarity of Instructions, Developer Experience, Applicability and Usability. IRIS Control Center currently qualifies for the announced **Docker container usage** technology bonus. Additional announced bonuses such as ZPM package deployment, an online demo and a YouTube demo are not claimed until they are actually delivered.
 
 Official references:
 
 - [Contest page](https://openexchange.intersystems.com/contest/48)
-- [Developer Community announcement](https://community.intersystems.com/post/intersystems-programming-contest-build-your-own-management-portal)
+- [Developer Community announcement and task](https://community.intersystems.com/post/intersystems-programming-contest-build-your-own-management-portal)
+- [Technology bonuses](https://community.intersystems.com/post/technology-bonuses-intersystems-programming-contest-build-your-own-management-portal)
 
 ## License
 
