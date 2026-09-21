@@ -25,6 +25,10 @@ ClassMethod Setup() As %Status
         Set ui.DispatchClass = "IRISControlCenter.UI"
         Set ui.ServeFiles = 0
         Set ui.Recurse = 1
+        // The shell contains no privileged data; API calls remain separately
+        // protected by password authentication. Do not require an application
+        // role merely to load the browser UI.
+        Set ui.MatchRoles = ""
         Set ui.AutheEnabled = 64
         Set sc = ui.%Save()
         If $$$ISERR(sc) $$$ThrowStatus(sc)
