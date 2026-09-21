@@ -10,8 +10,8 @@ const checks = [
   [rest, "If '..IsSafeRelativePath(path)", 'REST proxy no longer validates requested relative paths.'],
   [rest, 'request.Server = "127.0.0.1"', 'REST proxy is no longer pinned to the local IRIS instance.'],
   [rest, "If request.HttpResponse.StatusCode '= 200", 'OpenAPI proxy no longer rejects unsuccessful upstream responses.'],
-  [discovery, 'Do item.%Set("enabled",($Get(service.enabled)=1),"boolean")', 'Service discovery no longer normalizes enabled state to a JSON boolean.'],
-  [discovery, 'GetCatalogue(authHeader As %String = "", cookieHeader As %String = "")', 'Service discovery no longer accepts the authenticated inbound session.']
+  [discovery, 'Do item.%Set("enabled",(service.enabled=1),"boolean")', 'Service discovery no longer normalizes enabled state to a JSON boolean.'],
+  [discovery, '##class(%REST.API).GetAllWebRESTApps(.appList)', 'Service discovery no longer uses the native IRIS REST application catalogue.']
 ];
 
 for (const [source, fragment, message] of checks) {
