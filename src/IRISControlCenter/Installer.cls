@@ -19,11 +19,10 @@ ClassMethod Setup() As %Status
         Set ui.Description = "IRIS Control Center"
         Set ui.NameSpace = appNamespace
         Set ui.Enabled = 1
-        // Dispatch the small browser UI through IRIS rather than relying on
-        // private-web-server physical-path rules. Assets remain immutable in
-        // the image and outside ISC_DATA_DIRECTORY.
+        // Dispatch the browser UI through IRIS rather than relying on private
+        // web-server physical-path rules. Assets stay immutable in the image.
         Set ui.Path = "/home/irisowner/dev/web"
-        Set ui.DispatchClass = "IRISControlCenter.REST"
+        Set ui.DispatchClass = "IRISControlCenter.UI"
         Set ui.ServeFiles = 0
         Set ui.Recurse = 1
         Set ui.AutheEnabled = 64
