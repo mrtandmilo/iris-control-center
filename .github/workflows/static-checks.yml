@@ -64,6 +64,7 @@ jobs:
           set -euo pipefail
           test -s README.md
           test -s LICENSE
+          test -s SECURITY.md
           test -s Dockerfile
           test -s docker-compose.yml
           test -s docs/ARCHITECTURE.md
