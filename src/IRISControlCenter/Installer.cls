@@ -25,11 +25,12 @@ ClassMethod Setup() As %Status
         Set ui.DispatchClass = "IRISControlCenter.UI"
         Set ui.ServeFiles = 0
         Set ui.Recurse = 1
-        // The shell contains no privileged data; API calls remain separately
-        // protected by password authentication. Do not require an application
-        // role merely to load the browser UI.
+        // Use the same password authentication boundary as the API. Besides
+        // avoiding anonymous CSP authorization differences between IRIS
+        // releases, a successful browser login is reused for same-origin API
+        // requests and keeps the complete Control Center behind one boundary.
         Set ui.MatchRoles = ""
-        Set ui.AutheEnabled = 64
+        Set ui.AutheEnabled = 32
         Set sc = ui.%Save()
         If $$$ISERR(sc) $$$ThrowStatus(sc)
 
