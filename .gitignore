@@ -1,0 +1,23 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Runtime / test output
+*.log
+coverage/
+test-results/
+playwright-report/
+
+# OS / editor metadata
+.DS_Store
+.idea/
+.vscode/
+
+# Local scratch files
+*.tmp
+*.swp
