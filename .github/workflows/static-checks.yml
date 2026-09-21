@@ -85,16 +85,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Match literal credential values, while allowing code that reads
-          # credentials from environment variables (for example
-          # process.env.IRIS_PASSWORD or ${IRIS_PASSWORD}). Requiring the
-          # assignment separator for password prevents property/env references
-          # from becoming false positives.
+          # Match suspicious credential assignments, then discard well-known
+          # environment-variable reads. Keeping the filtering explicit avoids
+          # treating `const password = process.env.IRIS_PASSWORD` as a secret
+          # while still catching literal assignments such as password="...".
           pattern='authorization:[[:space:]]*(basic|bearer)[[:space:]]+[A-Za-z0-9+/_.=-]{8,}|password[[:space:]]*[:=][[:space:]]*[^$[:space:]][^[:space:]]{5,}'
           # Exclude documentation, smoke-test fixtures, and this workflow itself:
-          # the fail-fast tests above intentionally contain an obvious dummy
-          # password assignment, which must not make the secret scanner fail.
-          if git grep -nEi "$pattern" -- ':!docs/*' ':!scripts/smoke-test.sh' ':!.github/workflows/static-checks.yml'; then
+          # the fail-fast tests above intentionally contain obvious dummy
+          # password assignments, which must not make the scanner fail.
+          matches="$(git grep -nEi "$pattern" -- ':!docs/*' ':!scripts/smoke-test.sh' ':!.github/workflows/static-checks.yml' || true)"
+          matches="$(printf '%s\n' "$matches" | grep -Ev 'process\.env\.[A-Za-z_][A-Za-z0-9_]*|Deno\.env\.get\(|os\.environ|os\.getenv\(|ENV\[[^]]+\]|getenv\(' || true)"
+          if [[ -n "$matches" ]]; then
+            printf '%s\n' "$matches"
             echo 'Potential hard-coded credential found.' >&2
             exit 1
           fi
