@@ -19,10 +19,12 @@ ClassMethod Setup() As %Status
         Set ui.Description = "IRIS Control Center"
         Set ui.NameSpace = appNamespace
         Set ui.Enabled = 1
-        // Keep static assets outside ISC_DATA_DIRECTORY. The persistent data
-        // directory must remain empty until iris-main initializes it.
+        // Dispatch the small browser UI through IRIS rather than relying on
+        // private-web-server physical-path rules. Assets remain immutable in
+        // the image and outside ISC_DATA_DIRECTORY.
         Set ui.Path = "/home/irisowner/dev/web"
-        Set ui.ServeFiles = 1
+        Set ui.DispatchClass = "IRISControlCenter.REST"
+        Set ui.ServeFiles = 0
         Set ui.Recurse = 1
         Set ui.AutheEnabled = 64
         Set sc = ui.%Save()
