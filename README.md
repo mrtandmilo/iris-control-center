@@ -10,15 +10,16 @@ IRIS Control Center makes REST service discovery and API exploration faster and 
 
 ## Current capabilities
 
-- Discover REST-enabled applications through the IRIS management API.
+- Discover REST-enabled applications through the native IRIS REST application catalogue.
 - Normalize generated and manually configured web applications into a searchable catalogue.
 - Filter services by name, namespace and web application.
 - Inspect namespace, dispatch class, required resource and OpenAPI/Swagger metadata.
 - Browse OpenAPI operations grouped by their advertised paths.
-- Execute **GET** operations from the integrated request workbench, including query parameters, using the current authenticated browser session.
+- Execute **GET** operations from the integrated request workbench, including path and query parameters, using the current authenticated browser session.
 - Display HTTP status and formatted JSON/text responses inline.
 - Keep mutating POST/PUT/PATCH/DELETE operations inspect-only by design for the contest release.
-- Provide a reproducible IRIS Community container build with automated ObjectScript import and application setup.
+- Restrict request execution to discovered local IRIS web applications.
+- Provide a reproducible IRIS Community 2026.1 container build with automated ObjectScript import and application setup.
 
 ## Quick start
 
@@ -28,23 +29,23 @@ Prerequisites: Docker with Compose support and access to the InterSystems IRIS C
 docker compose up --build
 ```
 
-After IRIS is healthy, open the Control Center web application at:
+After IRIS is healthy, open:
 
 ```text
 http://localhost:52773/iris-control-center/
 ```
 
-The API is mounted separately at `/iris-control-center/api`. Authentication is delegated to IRIS; credentials and authorization headers are not stored by the browser application.
+The UI and API are protected by IRIS password authentication. The API is mounted separately at `/iris-control-center/api`. Credentials and authorization headers are not stored by the browser application.
 
 ## Architecture
 
 The application has three deliberately small layers:
 
-1. **IRIS discovery adapter** — queries the legacy `/api/mgmnt/` catalogue and normalizes service metadata. This endpoint is used deliberately because it exposes both generated and manually configured REST applications needed by the portal.
-2. **IRIS REST backend** — exposes health, catalogue and OpenAPI endpoints to the UI while forwarding the authenticated IRIS session where required.
+1. **IRIS discovery adapter** — uses the native `%REST.API.GetAllWebRESTApps()` interface and normalizes `%REST.Application` metadata for generated and manually configured REST applications.
+2. **IRIS REST backend** — exposes health, catalogue, OpenAPI and safe request-execution endpoints to the authenticated UI.
 3. **Browser Control Center** — searchable service catalogue, OpenAPI viewer and safe GET request workbench.
 
-Keeping the UI and API web applications separate makes their responsibilities and security settings explicit while allowing the UI to use the user's existing IRIS session. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the component diagram, request flow and trust-boundary rationale.
+The UI and API have separate IRIS web applications so routing and security responsibilities remain explicit, while both use the same IRIS authentication boundary. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the component diagram, request flow and trust-boundary rationale.
 
 ## Security principles
 
@@ -54,24 +55,29 @@ Keeping the UI and API web applications separate makes their responsibilities an
 - Discovery is read-only by default.
 - The interactive workbench executes GET operations only; mutating methods remain visible for documentation but cannot be launched from the UI.
 - Request execution is restricted to the selected service's local web-application path rather than accepting an arbitrary remote host.
+- Traversal attempts and unknown-service requests are rejected by the backend.
 
 ## Validation and contest preparation
 
-- [`docs/TESTING.md`](docs/TESTING.md) defines the clean-build, API, browser and security checks that must pass before the project is described as runtime-tested.
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) documents the application boundaries and security decisions for reviewers.
+The release is continuously validated from a clean disposable IRIS instance. The release-validation workflow removes the persistent test volume, pulls the pinned IRIS Community 2026.1 image, performs a no-cache build, compiles all ObjectScript classes, waits for container health and runs the application acceptance suite.
+
+The clean runtime acceptance suite verifies authenticated UI delivery, browser assets, API authentication, health, native service discovery, OpenAPI input validation, request-proxy validation, traversal protection and unknown-service isolation.
+
+- [`docs/TESTING.md`](docs/TESTING.md) defines the clean-build, API, browser and security release gates.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) documents application boundaries and security decisions.
 - [`docs/DEMO.md`](docs/DEMO.md) provides a repeatable three-minute judge/reviewer walkthrough and screenshot checklist.
 - [`docs/CONTEST_SUBMISSION.md`](docs/CONTEST_SUBMISSION.md) contains the evaluator-focused project summary, demo flow and final submission gate.
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) tracks the remaining delivery work.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) tracks final contest packaging work.
 
 ## Development status
 
-The main application flow is implemented: installation, service discovery, OpenAPI inspection and read-only request execution. Runtime validation against the target IRIS container and contest-focused testing/documentation remain in progress. Until the runtime checklist passes, this repository deliberately does not claim that the complete flow has been validated on the target container.
+The core contest workflow is implemented and runtime-tested against the pinned InterSystems IRIS Community 2026.1 container: installation, authentication, service discovery, OpenAPI inspection, safe read-only request execution and backend security contracts. Remaining work is release polish and contest packaging: browser/demo evidence, final documentation review, public-repository readiness and submission assets.
 
 ## Contest
 
 The official contest runs September 14–October 4, 2026, but **new submissions close September 27, 2026 at 23:59 EST**. Community voting runs September 28–October 4, and submitted applications may continue to be improved during voting.
 
-The contest scores Complexity, Clarity of Instructions, Developer Experience, Applicability and Usability. IRIS Control Center already uses a Docker container, which is one of the announced technology-bonus categories. Other bonus opportunities (such as IPM packaging, an online demo and a YouTube demo) are treated as optional release enhancements and are not claimed until they are actually delivered.
+The contest scores Complexity, Clarity of Instructions, Developer Experience, Applicability and Usability. IRIS Control Center uses a Docker container, one of the announced technology-bonus categories. Other bonus opportunities (such as IPM packaging, an online demo and a YouTube demo) are not claimed until they are actually delivered.
 
 Official references:
 
