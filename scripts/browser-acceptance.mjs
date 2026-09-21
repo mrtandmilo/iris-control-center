@@ -67,10 +67,74 @@ try {
     await page.locator('#endpoint-filter').fill('__control_center_no_endpoint__');
     await page.getByText('No matching endpoints.').waitFor();
   } else {
-    console.log('No OpenAPI-advertising service exists in the clean Community image; explorer rendering remains covered by static/runtime contracts.');
+    console.log('No OpenAPI-advertising service exists in the clean Community image; live explorer rendering remains covered by runtime contracts.');
   }
 
-  console.log(`Browser acceptance passed: ${apiCount} services discovered; keyboard selection, filtering, metadata and refresh verified${swaggerService ? '; OpenAPI explorer verified' : ''}.`);
+  // Deterministically exercise the interactive request UI without depending on
+  // optional APIs in the stock Community image. Only browser network responses
+  // are mocked here; production discovery/proxy behaviour is tested separately
+  // by the runtime acceptance suite.
+  const fixtureService = (apiCatalogue.services || []).find(service => service.enabled !== false && service.webApplication);
+  assert(fixtureService, 'Expected an enabled service for interactive request UI acceptance.');
+  const fixtureSpec = {
+    openapi: '3.0.3',
+    info: { title: 'Browser acceptance fixture', version: '1.0' },
+    paths: {
+      '/items/{id}': {
+        get: {
+          summary: 'Read item',
+          parameters: [
+            { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
+            { name: 'verbose', in: 'query', schema: { type: 'string' } }
+          ]
+        },
+        post: { summary: 'Mutating operation remains inspect-only' }
+      }
+    }
+  };
+  let observedProxy = null;
+  await page.route('**/iris-control-center/api/openapi?service=*', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify(fixtureSpec)
+  }));
+  await page.route('**/iris-control-center/api/request?*', route => {
+    observedProxy = new URL(route.request().url());
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { 'x-control-center-test': 'accepted' },
+      body: JSON.stringify({ ok: true, source: 'browser-acceptance' })
+    });
+  });
+
+  // Discovery may not mark a stock service as Swagger-enabled. Patch only the
+  // in-page catalogue flag so selection follows the same production UI path.
+  await page.evaluate(name => {
+    const service = catalogue.find(item => item.name === name);
+    service.swagger = '/browser-acceptance-openapi.json';
+  }, fixtureService.name);
+  await page.locator('#filter').fill(fixtureService.name);
+  await page.locator('.service').filter({ hasText: fixtureService.name }).first().click();
+  await page.locator('.api-summary').waitFor({ timeout: 30_000 });
+
+  const getEndpoint = page.locator('.endpoint').filter({ hasText: 'GET' }).first();
+  const postEndpoint = page.locator('.endpoint').filter({ hasText: 'POST' }).first();
+  assert(await getEndpoint.locator('.run-get').count() === 1, 'GET operation should expose execution control.');
+  assert(await postEndpoint.locator('.run-get').count() === 0, 'Mutating POST operation must remain inspect-only.');
+
+  await getEndpoint.locator('[data-param="id"]').fill('A/B 42');
+  await getEndpoint.locator('[data-param="verbose"]').fill('yes & more');
+  await getEndpoint.locator('.run-get').click();
+  await getEndpoint.locator('.response').getByText(/200 OK/).waitFor();
+  const responseText = await getEndpoint.locator('.response').textContent();
+  assert(responseText.includes('x-control-center-test: accepted'), 'Rendered response omitted response headers.');
+  assert(responseText.includes('"ok": true'), 'Rendered response omitted formatted JSON body.');
+  assert(observedProxy, 'Interactive GET did not call the request proxy.');
+  assert(observedProxy.searchParams.get('service') === fixtureService.name, 'Proxy request used the wrong service.');
+  assert(observedProxy.searchParams.get('path') === '/items/A%2FB%2042?verbose=yes+%26+more', `Unexpected encoded request path: ${observedProxy.searchParams.get('path')}`);
+
+  console.log(`Browser acceptance passed: ${apiCount} services discovered; catalogue UX, OpenAPI exploration, path/query encoding, GET execution, response rendering and mutating-method inspect-only behaviour verified.`);
 } finally {
   await browser.close();
 }
