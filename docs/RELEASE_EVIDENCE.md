@@ -5,10 +5,10 @@ This record tracks the final contest release. Do not record passwords, tokens, c
 ## Environment
 
 - Validation date (UTC): 2026-09-21
-- Runtime-validated commit SHA: `78715a01be99b32d6b3b4305f9620abad14c9f33`
+- Runtime-validated commit SHA: `15aff21a3b9324807e6fd78ff8ebd9e819d5b34f`
 - IRIS Community release: 2026.1
-- GitHub Actions runtime acceptance: **passed** (run 38)
-- GitHub Actions static checks: **passed** (run 112)
+- GitHub Actions runtime acceptance: **passed** (run 41)
+- GitHub Actions static checks: **passed** (run 115)
 - Host tooling/OS details: not retained in repository evidence; reproduce during final clean-checkout validation
 
 ## Clean build and installation
@@ -19,7 +19,7 @@ This record tracks the final contest release. Do not record passwords, tokens, c
 - [x] `/iris-control-center` was enabled and authenticated UI assets were delivered.
 - [x] `/iris-control-center/api` was enabled and authenticated API readiness passed.
 
-Evidence/notes: The first fully clean runtime acceptance was established on `b821bac`. Subsequent documentation, accessibility and security-release hardening culminated in `78715a0`, whose runtime-acceptance and static-check workflows both completed successfully. Earlier misleading green runs were rejected because build output still contained an ObjectScript compilation error; those runs are not treated as release evidence.
+Evidence/notes: The first fully clean runtime acceptance was established on `b821bac`. Subsequent documentation, accessibility, security and contest-packaging hardening culminated in `15aff21a`, whose runtime-acceptance and static-check workflows both completed successfully. Earlier misleading green runs were rejected because build output still contained an ObjectScript compilation error; those runs are not treated as release evidence.
 
 ## Automated runtime validation
 
@@ -32,7 +32,7 @@ Evidence/notes: The first fully clean runtime acceptance was established on `b82
 - [x] Unknown-service isolation passed.
 - [x] Authenticated UI, JavaScript and CSS delivery passed.
 
-Evidence/notes: The clean acceptance suite reaches all 10 runtime checks successfully on IRIS Community 2026.1. The latest validated repository head is `78715a0`.
+Evidence/notes: The clean acceptance suite reaches all 10 runtime checks successfully on IRIS Community 2026.1. The latest validated repository head is `15aff21a`.
 
 ## Browser acceptance
 
@@ -65,7 +65,7 @@ Evidence/notes: The repository is currently private, so public-repository contes
 
 ## Release decision
 
-Runtime validation status: **PASSED on `78715a0` / IRIS Community 2026.1**
+Runtime validation status: **PASSED on `15aff21a` / IRIS Community 2026.1**
 
 Contest-release status: **NOT YET READY FOR FINAL SUBMISSION**
 
