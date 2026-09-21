@@ -1,19 +1,27 @@
 import { chromium } from 'playwright';
+import { mkdir } from 'node:fs/promises';
 
 const base = process.env.BASE_URL || 'http://localhost:52773';
 const user = process.env.IRIS_USER || '_SYSTEM';
 const password = process.env.IRIS_PASSWORD;
+const artifactDir = process.env.BROWSER_ARTIFACT_DIR;
 if (!password) {
   console.error('IRIS_PASSWORD must be set for browser acceptance.');
   process.exit(2);
 }
+if (artifactDir) await mkdir(artifactDir, { recursive: true });
 
 const authorization = `Basic ${Buffer.from(`${user}:${password}`).toString('base64')}`;
 const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ extraHTTPHeaders: { Authorization: authorization } });
+const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, extraHTTPHeaders: { Authorization: authorization } });
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+async function capture(name) {
+  if (!artifactDir) return;
+  await page.screenshot({ path: `${artifactDir}/${name}.png`, fullPage: true });
 }
 
 try {
@@ -29,6 +37,7 @@ try {
   const renderedCount = Number(await page.locator('#count').textContent());
   assert(apiCount > 0, 'Expected at least one discovered REST service.');
   assert(renderedCount === apiCount, `Catalogue count mismatch: UI=${renderedCount}, API=${apiCount}.`);
+  await capture('01-real-catalogue');
 
   const first = page.locator('.service').first();
   const firstName = (await first.locator('strong').textContent()).trim();
@@ -45,6 +54,7 @@ try {
   await page.locator('#detail h2').waitFor();
   assert(await selectable.getAttribute('aria-pressed') === 'true', 'Selected service did not expose aria-pressed=true.');
   assert(await page.locator('.meta .card').count() === 4, 'Expected all four service metadata cards.');
+  await capture('02-real-selected-service');
 
   const beforeRefresh = Number(await page.locator('#count').textContent());
   await page.locator('#refresh').click();
@@ -64,6 +74,7 @@ try {
     const text = await page.locator('#endpoints').textContent();
     assert(!text.includes('Could not load OpenAPI definition:'), `OpenAPI browser load failed: ${text}`);
     assert(await page.locator('.api-summary').count() === 1, 'OpenAPI summary was not rendered.');
+    await capture('03-real-openapi-explorer');
     await page.locator('#endpoint-filter').fill('__control_center_no_endpoint__');
     await page.getByText('No matching endpoints.').waitFor();
   } else {
@@ -73,7 +84,9 @@ try {
   // Deterministically exercise the interactive request UI without depending on
   // optional APIs in the stock Community image. Only browser network responses
   // are mocked here; production discovery/proxy behaviour is tested separately
-  // by the runtime acceptance suite.
+  // by the runtime acceptance suite. Mock-backed states are deliberately not
+  // captured as release screenshots so evidence cannot be mistaken for a live
+  // IRIS response.
   const fixtureService = (apiCatalogue.services || []).find(service => service.enabled !== false && service.webApplication);
   assert(fixtureService, 'Expected an enabled service for interactive request UI acceptance.');
   const fixtureSpec = {
