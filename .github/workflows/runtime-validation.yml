@@ -16,7 +16,7 @@ concurrency:
 jobs:
   acceptance:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       # Keep CI on the same immutable Community image used by Compose. The
       # digest prevents a registry tag update from silently changing the runtime
@@ -33,6 +33,14 @@ jobs:
 
       - name: Run clean release validation
         run: ./scripts/release-validation.sh
+
+      - name: Install browser acceptance dependency
+        run: |
+          npm install --no-save --no-package-lock playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Run real-browser acceptance
+        run: node scripts/browser-acceptance.mjs
 
       - name: Capture container diagnostics on failure
         if: failure()
