@@ -1,35 +1,37 @@
 # Release validation evidence
 
-Use this record for the final contest release. Do not mark an item complete until it has been observed on a clean IRIS Community runtime. Do not record passwords, tokens, cookies, authorization headers, registry credentials, or other secrets here.
+This record tracks the final contest release. Do not record passwords, tokens, cookies, authorization headers, registry credentials, or other secrets here.
 
 ## Environment
 
-- Validation date (UTC): _pending_
-- Git commit SHA: _pending_
-- IRIS Community image tag: _pending_
-- Docker/Compose version: _pending_
-- Host OS/architecture: _pending_
+- Validation date (UTC): 2026-09-21
+- Runtime-validated commit SHA: `b821bac13be54ceac491978d9633c692d57e9aac`
+- Current documentation descendants: `0b9c883`, `10be27e` (documentation-only changes after the validated runtime commit)
+- IRIS Community release: 2026.1
+- Host tooling/OS details: not retained in repository evidence; reproduce during final clean-checkout validation
 
 ## Clean build and installation
 
-- [ ] `docker compose build --no-cache` succeeds with the pinned IRIS image.
-- [ ] `docker compose up` reaches a healthy IRIS state.
-- [ ] Setup imports and compiles the application classes without errors.
-- [ ] `/iris-control-center` is enabled.
-- [ ] `/iris-control-center/api` is enabled.
+- [x] Clean IRIS Community 2026.1 image build completed.
+- [x] Container reached a healthy IRIS state.
+- [x] Setup imported and compiled all four application classes without errors.
+- [x] `/iris-control-center` was enabled and authenticated UI assets were delivered.
+- [x] `/iris-control-center/api` was enabled and authenticated API readiness passed.
 
-Evidence/notes: _pending_
+Evidence/notes: Clean runtime acceptance completed on `b821bac`. Earlier misleading green runs were rejected because build output still contained an ObjectScript compilation error; the recorded pass is the subsequent run after that compiler defect was fixed.
 
 ## Automated runtime validation
 
-- [ ] `scripts/smoke-test.sh` completes successfully against the clean instance.
-- [ ] Health contract passes.
-- [ ] Service discovery contract passes.
-- [ ] OpenAPI error isolation checks pass.
-- [ ] Request-proxy validation checks pass.
-- [ ] Traversal/security regression checks pass.
+- [x] `scripts/smoke-test.sh` completed successfully against the clean instance.
+- [x] Health contract passed.
+- [x] Native service-discovery contract passed.
+- [x] OpenAPI validation/error-isolation checks passed.
+- [x] GET request-proxy validation checks passed.
+- [x] Traversal/security regression checks passed.
+- [x] Unknown-service isolation passed.
+- [x] Authenticated UI, JavaScript and CSS delivery passed.
 
-Evidence/notes: _pending_
+Evidence/notes: The clean acceptance suite reached all 10 runtime checks successfully on IRIS Community 2026.1.
 
 ## Browser acceptance
 
@@ -44,22 +46,25 @@ Evidence/notes: _pending_
 - [ ] Mutating methods remain inspect-only.
 - [ ] Refresh re-runs discovery without a page reload.
 
-Evidence/notes: _pending_
+Evidence/notes: Automated delivery and API behaviour are proven; visual/browser interaction remains a separate final acceptance gate and must not be inferred from HTTP smoke tests.
 
 ## Contest/demo evidence
 
 - [ ] Service catalogue screenshot captured.
 - [ ] OpenAPI explorer screenshot captured.
 - [ ] Successful safe GET execution screenshot captured.
-- [ ] README installation steps reproduced from a clean checkout.
+- [ ] README installation steps reproduced from a fresh public checkout.
 - [ ] README/demo links checked.
 - [ ] Repository checked for committed secrets and private information.
 - [ ] Known limitations reviewed for accuracy.
+- [ ] Repository made publicly accessible as required by the contest.
 
-Evidence/notes: _pending_
+Evidence/notes: The repository is currently private, so public-repository contest compliance is not yet satisfied.
 
 ## Release decision
 
-Runtime validation status: **PENDING**
+Runtime validation status: **PASSED on `b821bac` / IRIS Community 2026.1**
 
-The project must not be described as fully runtime-validated or ready for final contest submission until every required release-gate item above passes. Contest submission and acceptance of contest/legal terms remain owner actions.
+Contest-release status: **NOT YET READY FOR FINAL SUBMISSION**
+
+Remaining gates are browser/demo evidence, final clean-checkout/repository review, and public repository availability. Contest submission and acceptance of contest/legal terms remain owner actions.
