@@ -35,7 +35,7 @@
 - [x] Open Exchange metadata draft
 - [x] Submission checklist and evaluator-focused demo script
 - [x] Automated secret/private-information guard in CI
-- [ ] Capture final service catalogue, OpenAPI explorer and safe-GET screenshots
+- [ ] Capture the five final evidence images defined in `DEMO.md`: catalogue, selected-service metadata, OpenAPI explorer, successful safe GET, and passing smoke test
 - [ ] Reproduce README installation from the final public checkout
 - [ ] Make the repository public
 - [ ] Optional: publish a demo video if pursuing the announced video bonus
@@ -44,6 +44,8 @@
 ## Release boundary
 
 The application implementation and automated technical acceptance are complete for the contest scope. Remaining items are release/publication evidence and owner-controlled submission actions; they should not be represented as completed until they actually occur.
+
+The screenshot set is intentionally defined once in `DEMO.md`; this roadmap tracks completion of that set rather than maintaining a competing screenshot count.
 
 ## Scope discipline
 
