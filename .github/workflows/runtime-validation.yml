@@ -32,7 +32,21 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Run clean release validation
-        run: ./scripts/release-validation.sh
+        # Keep the complete non-secret transcript as release evidence. The
+        # validation scripts never print IRIS_PASSWORD; pipefail preserves the
+        # validator's exit status if tee succeeds after a failure.
+        run: |
+          set -o pipefail
+          ./scripts/release-validation.sh 2>&1 | tee release-validation.log
+
+      - name: Upload release validation transcript
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-validation-${{ github.run_id }}
+          path: release-validation.log
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Install browser acceptance dependency
         run: |
