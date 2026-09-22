@@ -63,15 +63,37 @@ Summarize the workflow:
 
 Then mention that the project is open source, containerized for repeatable installation, and includes smoke/static checks and explicit runtime-validation evidence.
 
+## Final evidence package
+
+The release browser suite deliberately captures only genuine IRIS states. For the currently validated release, use the `browser-evidence-35719631567` artifact from runtime acceptance run 69 as the authoritative source for images 1–4 below. Use the separate `release-validation-35719631567` artifact for the smoke-test proof. Both artifacts are retained by GitHub Actions until 2026-10-06; package the final submission evidence before that date.
+
+1. `01-real-service-catalogue.png` — catalogue with discovered IRIS services visible.
+2. `02-real-selected-service.png` — selected service with live IRIS metadata.
+3. `03-real-openapi-explorer.png` — the first-party Control Center OpenAPI contract rendered by the explorer.
+4. `04-real-safe-get.png` — successful first-party `/health` GET executed through the production request proxy, including status/timing/result.
+5. `release-validation-35719631567` transcript — select or render the final section showing the clean smoke/release validation passing. Do not substitute an edited terminal result or fixture-backed screenshot.
+
+Before publication, inspect every selected image for browser chrome, account names, cookies, authorization data, local/private infrastructure names, or any other information that should not become public. The automated repository guard does not inspect screenshot pixels.
+
+If a fresh final validation supersedes run 69, use all browser images and the validation transcript from the same newer successful runtime run and update `RELEASE_EVIDENCE.md`; do not mix evidence from different release candidates unless the provenance is explicitly documented.
+
+## Fresh public-checkout rehearsal
+
+Once repository visibility has been changed by the owner, reproduce the judge path from a new directory rather than relying on the development checkout:
+
+```bash
+cd "$(mktemp -d)"
+git clone https://github.com/mrtandmilo/iris-control-center.git
+cd iris-control-center
+docker compose up --build -d
+docker compose ps
+```
+
+Wait for the IRIS service to become healthy, then run the smoke command from **Before recording or presenting** and follow the README installation path exactly. Record the public commit SHA and outcome in `RELEASE_EVIDENCE.md`. This is the final installation gate because it proves that a judge can start from the public repository alone.
+
 ## Screenshots for the submission
 
-Capture these after final runtime validation:
-
-1. Catalogue with several discovered services visible.
-2. Selected service showing IRIS metadata.
-3. OpenAPI endpoint list with method summary/filter.
-4. Successful safe GET response showing status and timing.
-5. Terminal showing the smoke test passing.
+Use the five-item evidence package above. Do not recapture fixture-backed states merely to make the screenshots look cleaner. If a new live capture is required, run the full runtime acceptance workflow and take all release screenshots from that validated instance.
 
 Avoid screenshots containing browser password dialogs, terminal command history with credentials, Authorization headers, cookies, or private system information.
 
