@@ -5,12 +5,12 @@ This record tracks the final contest release. Do not record passwords, tokens, c
 ## Environment
 
 - Validation date (UTC): 2026-09-22
-- Runtime-validated commit SHA: `93bb7bac34456dc6d53f77a861bd88d0dc479c50`
+- Runtime-validated commit SHA: `fd1af7e2738c04b332239023bc088945bd74034b`
 - IRIS Community release: 2026.1
-- GitHub Actions runtime acceptance: **passed** (run 57)
-- GitHub Actions static checks: **passed** (run 131)
-- Real Chromium acceptance: **passed** as part of runtime acceptance run 57
-- Browser evidence artifact: `browser-evidence-35674365071` (artifact `10672831364`, retained by GitHub Actions until 2026-10-06)
+- GitHub Actions runtime acceptance: **passed** (run 59)
+- GitHub Actions static checks: **passed** (run 133)
+- Real Chromium acceptance: **passed** as part of runtime acceptance run 59
+- Browser evidence artifact: `browser-evidence-35682094739` (artifact `10675615184`, retained by GitHub Actions until 2026-10-06)
 - Host tooling/OS details: not retained in repository evidence; reproduce during final clean-checkout validation
 
 ## Clean build and installation
@@ -21,7 +21,7 @@ This record tracks the final contest release. Do not record passwords, tokens, c
 - [x] `/iris-control-center` was enabled and authenticated UI assets were delivered.
 - [x] `/iris-control-center/api` was enabled and authenticated API readiness passed.
 
-Evidence/notes: The first fully clean runtime acceptance was established on `b821bac`. Subsequent documentation, accessibility, security, contest-packaging and browser-acceptance hardening culminated in `93bb7ba`, whose runtime-acceptance and static-check workflows both completed successfully. Earlier misleading green runs were rejected because build output still contained an ObjectScript compilation error; those runs are not treated as release evidence.
+Evidence/notes: The first fully clean runtime acceptance was established on `b821bac`. Subsequent documentation, accessibility, security, contest-packaging and browser-acceptance hardening culminated in `fd1af7e`, whose runtime-acceptance and static-check workflows both completed successfully. Earlier misleading green runs were rejected because build output still contained an ObjectScript compilation error; those runs are not treated as release evidence.
 
 ## Automated runtime validation
 
@@ -34,7 +34,7 @@ Evidence/notes: The first fully clean runtime acceptance was established on `b82
 - [x] Unknown-service isolation passed.
 - [x] Authenticated UI, JavaScript and CSS delivery passed.
 
-Evidence/notes: The clean acceptance suite reaches all 10 runtime checks successfully on IRIS Community 2026.1. The latest validated repository head is `93bb7ba`.
+Evidence/notes: The clean acceptance suite reaches all 10 runtime checks successfully on IRIS Community 2026.1. The latest validated repository head is `fd1af7e`.
 
 ## Browser acceptance
 
@@ -50,7 +50,7 @@ Evidence/notes: The clean acceptance suite reaches all 10 runtime checks success
 - [x] Response status, timing, headers and formatted JSON body render after browser execution.
 - [x] Mutating POST operations remain inspect-only in the browser.
 
-Evidence/notes: `scripts/browser-acceptance.mjs` runs headless Chromium against the validated IRIS instance and uses a deterministic in-browser OpenAPI fixture for interaction paths that a clean IRIS install does not guarantee will be advertised. Runtime acceptance run 57 passed the complete harness on `93bb7ba`. The same run retained real-IRIS browser screenshots as a GitHub Actions artifact; mock-backed REST execution states are intentionally not presented as live IRIS evidence.
+Evidence/notes: `scripts/browser-acceptance.mjs` runs headless Chromium against the validated IRIS instance and uses a deterministic in-browser OpenAPI fixture for interaction paths that a clean IRIS install does not guarantee will be advertised. Runtime acceptance run 59 passed the complete harness on `fd1af7e`. The same run retained real-IRIS browser screenshots as a GitHub Actions artifact; mock-backed REST execution states are intentionally not presented as live IRIS evidence.
 
 ## Contest/demo evidence
 
@@ -62,18 +62,18 @@ The authoritative final screenshot set is the five-image checklist in `DEMO.md`.
 - [ ] Successful safe GET final evidence image captured against a real service. Deterministic mock-backed browser acceptance proves the interaction but is deliberately not used as live demo evidence.
 - [ ] Passing smoke-test evidence image captured for the final demo set.
 - [ ] README installation steps reproduced from a fresh public checkout.
-- [x] README/demo local links checked automatically by `scripts/check-markdown-links.mjs`; static checks run 131 passed on `93bb7ba`.
+- [x] README/demo local links checked automatically by `scripts/check-markdown-links.mjs`; static checks run 133 passed on `fd1af7e`.
 - [x] Automated repository guard checks committed content for credential/private-information patterns in CI.
 - [ ] Final human review for private information completed before publication.
-- [ ] Known limitations reviewed for accuracy.
+- [x] Known limitations reviewed for accuracy and documented explicitly in the README on `fd1af7e`.
 - [ ] Repository made publicly accessible as required by the contest.
 
-Evidence/notes: Runtime acceptance run 57 produced `browser-evidence-35674365071`, preserving genuine browser evidence from the clean IRIS Community instance. This advances the demo-evidence gate without presenting fixture-backed states as live IRIS screenshots. Static checks run 131 also validates local Markdown links across `README.md` and `docs/`. The repository is currently private, so public-repository contest compliance is not yet satisfied.
+Evidence/notes: Runtime acceptance run 59 produced `browser-evidence-35682094739`, preserving genuine browser evidence from the clean IRIS Community instance. This advances the demo-evidence gate without presenting fixture-backed states as live IRIS screenshots. Static checks run 133 also validates local Markdown links across `README.md` and `docs/`. The repository is currently private, so public-repository contest compliance is not yet satisfied.
 
 ## Release decision
 
-Runtime validation status: **PASSED on `93bb7ba` / IRIS Community 2026.1, including complete interactive Chromium acceptance**
+Runtime validation status: **PASSED on `fd1af7e` / IRIS Community 2026.1, including complete interactive Chromium acceptance**
 
 Contest-release status: **NOT YET READY FOR FINAL SUBMISSION**
 
-Remaining gates are completion of the five-image demo set, final clean-checkout/human privacy review, known-limitations review, and public repository availability. Contest submission and acceptance of contest/legal terms remain owner actions.
+Remaining gates are completion of the five-image demo set, final clean-checkout/human privacy review, and public repository availability. Contest submission and acceptance of contest/legal terms remain owner actions.
