@@ -86,6 +86,28 @@ jobs:
           test -s src/IRISControlCenter/REST.cls
           test -s src/IRISControlCenter/ServiceDiscovery.cls
 
+      - name: Guard publishable file set
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Repository visibility is intentionally still private during build-out,
+          # but every tracked path should already be safe to expose. Reject common
+          # local credential/key material before the final visibility change.
+          unsafe_paths="$(git ls-files | grep -Ei '(^|/)(\.env($|\.)|id_(rsa|dsa|ecdsa|ed25519)(\.pub)?$|credentials?($|\.)|secrets?($|\.)|.*\.(p12|pfx|pem|key|keystore|jks)$)' || true)"
+          if [[ -n "$unsafe_paths" ]]; then
+            printf '%s\n' "$unsafe_paths"
+            echo 'Potential private credential/key file is tracked.' >&2
+            exit 1
+          fi
+
+          private_keys="$(git grep -nE -- '-----BEGIN ([A-Z0-9 ]+ )?PRIVATE KEY-----' || true)"
+          if [[ -n "$private_keys" ]]; then
+            printf '%s\n' "$private_keys"
+            echo 'Private-key material found in tracked content.' >&2
+            exit 1
+          fi
+
       - name: Guard against committed secrets
         shell: bash
         run: |
