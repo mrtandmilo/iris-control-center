@@ -1,0 +1,33 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "IRIS Control Center API",
+    "version": "1.0.0",
+    "description": "Read-only runtime API exposed by IRIS Control Center."
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Check Control Center health",
+        "operationId": "controlCenterHealth",
+        "responses": {
+          "200": {
+            "description": "Control Center is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" },
+                    "application": { "type": "string" },
+                    "namespace": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
