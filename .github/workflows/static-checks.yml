@@ -18,12 +18,16 @@ jobs:
         run: |
           node --check web/app.js
           node --check scripts/browser-acceptance.mjs
+          node --check scripts/check-markdown-links.mjs
 
       - name: Validate browser shell integrity
         run: node scripts/static-ui-check.mjs
 
       - name: Validate ObjectScript runtime contracts
         run: node scripts/static-objectscript-check.mjs
+
+      - name: Validate documentation links
+        run: node scripts/check-markdown-links.mjs
 
       - name: Validate shell script syntax
         run: |
@@ -75,6 +79,7 @@ jobs:
           test -s docs/CONTEST_SUBMISSION.md
           test -s docs/RELEASE_EVIDENCE.md
           test -s scripts/browser-acceptance.mjs
+          test -s scripts/check-markdown-links.mjs
           test -s scripts/release-validation.sh
           test -s scripts/static-objectscript-check.mjs
           test -s src/IRISControlCenter/Installer.cls
