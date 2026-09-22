@@ -59,6 +59,16 @@ The UI and API have separate IRIS web applications so routing and security respo
 - Request execution is restricted to the selected service's local web-application path rather than accepting an arbitrary remote host.
 - Traversal attempts and unknown-service requests are rejected by the backend.
 
+## Contest-release limitations
+
+The deliberately narrow release scope keeps the explorer useful without turning it into a second unrestricted administration console:
+
+- Interactive execution is limited to **GET**. POST, PUT, PATCH and DELETE operations can be inspected but not executed.
+- The explorer only executes requests against REST web applications discovered on the same IRIS instance; arbitrary external URLs are not accepted.
+- OpenAPI exploration depends on a discovered service advertising a usable OpenAPI/Swagger definition. Services without one still appear in the catalogue and expose their available IRIS metadata.
+- The supplied and continuously tested deployment target is the pinned **IRIS Community 2026.1** container configuration. Other IRIS editions or releases are not claimed as validated by this contest build.
+- The project does not replace the full InterSystems Management Portal; its contest scope is REST service discovery, contract exploration and safe read-only request execution.
+
 ## Validation and contest preparation
 
 The release is continuously validated from a clean disposable IRIS instance. The release-validation workflow removes the persistent test volume, pulls the pinned IRIS Community 2026.1 image, performs a no-cache build, compiles all ObjectScript classes, waits for container health and runs the application acceptance suite.
