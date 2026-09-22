@@ -7,6 +7,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
   <Route Url="/" Method="GET" Call="Index" />
   <Route Url="/app.js" Method="GET" Call="AppJS" />
   <Route Url="/app.css" Method="GET" Call="AppCSS" />
+  <Route Url="/openapi.json" Method="GET" Call="OpenAPI" />
 </Routes>
 }
 
@@ -37,6 +38,11 @@ ClassMethod AppJS() As %Status
 ClassMethod AppCSS() As %Status
 {
     Quit ..Send("app.css","text/css; charset=utf-8")
+}
+
+ClassMethod OpenAPI() As %Status
+{
+    Quit ..Send("openapi.json","application/json; charset=utf-8")
 }
 
 }
