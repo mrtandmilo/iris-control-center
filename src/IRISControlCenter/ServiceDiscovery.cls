@@ -30,13 +30,21 @@ ClassMethod GetCatalogue(authHeader As %String = "", cookieHeader As %String = "
                 // execution while retaining the discovery name as the stable key.
                 If webApplication["," Set webApplication=$Piece(webApplication,",",1)
 
+                Set swagger = service.swaggerSpec
+                // The Control Center is itself a discovered REST service. Its
+                // hand-written %CSP.REST class has no native swaggerSpec metadata,
+                // so advertise the first-party OpenAPI document served by the UI.
+                // This also provides a deterministic real service for validating
+                // explorer and safe-GET behaviour on every clean installation.
+                If service.name="/iris-control-center/api" Set swagger="/iris-control-center/openapi.json"
+
                 Set item = {
                     "name":(service.name),
                     "webApplication":(webApplication),
                     "dispatchClass":(service.dispatchClass),
                     "namespace":(service.namespace),
                     "resource":(service.resource),
-                    "swagger":(service.swaggerSpec)
+                    "swagger":(swagger)
                 }
                 Do item.%Set("enabled",(service.enabled=1),"boolean")
                 Do result.services.%Push(item)
