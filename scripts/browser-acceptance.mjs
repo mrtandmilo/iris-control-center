@@ -47,7 +47,6 @@ try {
   await page.getByText('No matching services.').waitFor();
   await page.locator('#filter').fill('');
 
-  // Exercise selection through the keyboard rather than a synthetic click.
   const selectable = page.locator('.service').first();
   await selectable.focus();
   await page.keyboard.press('Enter');
@@ -60,33 +59,41 @@ try {
   await page.locator('#refresh').click();
   await page.waitForFunction(expected => Number(document.querySelector('#count')?.textContent) === expected && document.querySelectorAll('.service').length > 0, beforeRefresh);
 
-  // If the clean Community instance advertises an OpenAPI-enabled service,
-  // verify the browser can select it and reach a terminal explorer state.
-  const swaggerService = (apiCatalogue.services || []).find(service => service.swagger);
-  if (swaggerService) {
-    await page.locator('#filter').fill(swaggerService.name || '');
-    const candidate = page.locator('.service').filter({ hasText: swaggerService.name }).first();
-    await candidate.click();
-    await page.waitForFunction(() => {
-      const host = document.querySelector('#endpoints');
-      return host && !host.textContent.includes('Loading API definition…');
-    }, null, { timeout: 30_000 });
-    const text = await page.locator('#endpoints').textContent();
-    assert(!text.includes('Could not load OpenAPI definition:'), `OpenAPI browser load failed: ${text}`);
-    assert(await page.locator('.api-summary').count() === 1, 'OpenAPI summary was not rendered.');
-    await capture('03-real-openapi-explorer');
-    await page.locator('#endpoint-filter').fill('__control_center_no_endpoint__');
-    await page.getByText('No matching endpoints.').waitFor();
-  } else {
-    console.log('No OpenAPI-advertising service exists in the clean Community image; live explorer rendering remains covered by runtime contracts.');
-  }
+  // The application advertises its own first-party OpenAPI contract through
+  // normal IRIS service discovery. Use that deterministic real service for
+  // release evidence, then execute its safe /health GET through the production
+  // request proxy. Nothing in this evidence path is mocked.
+  const controlCenterService = (apiCatalogue.services || []).find(service => service.name === '/iris-control-center/api');
+  assert(controlCenterService, 'Control Center API was not returned by real IRIS service discovery.');
+  assert(controlCenterService.swagger, 'Control Center API did not advertise its first-party OpenAPI contract.');
+  await page.locator('#filter').fill(controlCenterService.name);
+  const controlCenterCandidate = page.locator('.service').filter({ hasText: controlCenterService.name }).first();
+  await controlCenterCandidate.click();
+  await page.waitForFunction(() => {
+    const host = document.querySelector('#endpoints');
+    return host && !host.textContent.includes('Loading API definition…');
+  }, null, { timeout: 30_000 });
+  const explorerText = await page.locator('#endpoints').textContent();
+  assert(!explorerText.includes('Could not load OpenAPI definition:'), `OpenAPI browser load failed: ${explorerText}`);
+  assert(await page.locator('.api-summary').count() === 1, 'OpenAPI summary was not rendered.');
+  await capture('03-real-openapi-explorer');
 
-  // Deterministically exercise the interactive request UI without depending on
-  // optional APIs in the stock Community image. Only browser network responses
-  // are mocked here; production discovery/proxy behaviour is tested separately
-  // by the runtime acceptance suite. Mock-backed states are deliberately not
-  // captured as release screenshots so evidence cannot be mistaken for a live
-  // IRIS response.
+  const liveHealthEndpoint = page.locator('.endpoint').filter({ hasText: '/health' }).first();
+  assert(await liveHealthEndpoint.locator('.run-get').count() === 1, 'Real /health GET did not expose execution control.');
+  await liveHealthEndpoint.locator('.run-get').click();
+  await liveHealthEndpoint.locator('.response').getByText(/200 OK/).waitFor({ timeout: 30_000 });
+  const liveHealthResponse = await liveHealthEndpoint.locator('.response').textContent();
+  assert(liveHealthResponse.includes('"status": "ok"'), 'Real /health response did not contain status=ok.');
+  assert(liveHealthResponse.includes('IRIS Control Center'), 'Real /health response did not identify IRIS Control Center.');
+  await capture('04-real-safe-get');
+
+  await page.locator('#endpoint-filter').fill('__control_center_no_endpoint__');
+  await page.getByText('No matching endpoints.').waitFor();
+  await page.locator('#endpoint-filter').fill('');
+
+  // Deterministically exercise parameter encoding and inspect-only handling for
+  // mutating methods. Only this deeper UI-contract section is mocked; release
+  // screenshots above all come from the live IRIS instance.
   const fixtureService = (apiCatalogue.services || []).find(service => service.enabled !== false && service.webApplication);
   assert(fixtureService, 'Expected an enabled service for interactive request UI acceptance.');
   const fixtureSpec = {
@@ -121,8 +128,6 @@ try {
     });
   });
 
-  // Discovery may not mark a stock service as Swagger-enabled. Patch only the
-  // in-page catalogue flag so selection follows the same production UI path.
   await page.evaluate(name => {
     const service = catalogue.find(item => item.name === name);
     service.swagger = '/browser-acceptance-openapi.json';
@@ -147,7 +152,7 @@ try {
   assert(observedProxy.searchParams.get('service') === fixtureService.name, 'Proxy request used the wrong service.');
   assert(observedProxy.searchParams.get('path') === '/items/A%2FB%2042?verbose=yes+%26+more', `Unexpected encoded request path: ${observedProxy.searchParams.get('path')}`);
 
-  console.log(`Browser acceptance passed: ${apiCount} services discovered; catalogue UX, OpenAPI exploration, path/query encoding, GET execution, response rendering and mutating-method inspect-only behaviour verified.`);
+  console.log(`Browser acceptance passed: ${apiCount} services discovered; catalogue UX, real OpenAPI exploration, genuine safe-GET execution, response rendering, path/query encoding and mutating-method inspect-only behaviour verified.`);
 } finally {
   await browser.close();
 }
