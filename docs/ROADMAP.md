@@ -35,8 +35,8 @@
 - [x] Open Exchange metadata draft
 - [x] Submission checklist and evaluator-focused demo script
 - [x] Automated secret/private-information guard in CI
-- [ ] Capture the five final evidence images defined in `DEMO.md`: catalogue, selected-service metadata, OpenAPI explorer, successful safe GET, and passing smoke test
-- [ ] Reproduce README installation from the final public checkout
+- [x] Retain the five-item evidence package defined in `DEMO.md`: four genuine IRIS screenshots and passing validation transcripts (runtime run 75)
+- [x] Reproduce README installation from an anonymous public checkout (runtime run 75)
 - [x] Make the repository public (anonymous clone verified 2026-09-23)
 - [ ] Optional: publish a demo video if pursuing the announced video bonus
 - [ ] Owner approval and final contest submission
@@ -45,7 +45,7 @@
 
 The application implementation and automated technical acceptance are complete for the contest scope. Remaining items are release/publication evidence and owner-controlled submission actions; they should not be represented as completed until they actually occur.
 
-The screenshot set is intentionally defined once in `DEMO.md`; this roadmap tracks completion of that set rather than maintaining a competing screenshot count.
+The evidence package is intentionally defined once in `DEMO.md`; this roadmap tracks completion of that set rather than maintaining a competing screenshot count.
 
 ## Scope discipline
 

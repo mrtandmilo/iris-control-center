@@ -83,7 +83,7 @@ The clean runtime acceptance suite verifies authenticated UI delivery, browser a
 
 ## Development status
 
-The core contest workflow is implemented and runtime-tested against the pinned InterSystems IRIS Community 2026.1 container: installation, authentication, service discovery, OpenAPI inspection, safe read-only request execution and backend security contracts. Remaining work is release polish and contest packaging: browser/demo evidence, final documentation review, public-repository readiness and submission assets.
+The core contest workflow is implemented and runtime-tested against the pinned InterSystems IRIS Community 2026.1 container: installation, authentication, service discovery, OpenAPI inspection, safe read-only request execution and backend security contracts. Anonymous public-checkout installation, clean release validation and real-browser evidence have passed; see `docs/RELEASE_EVIDENCE.md` for the exact tested revision. Contest submission and acceptance of terms remain subject to separate owner approval.
 
 ## Contest
 

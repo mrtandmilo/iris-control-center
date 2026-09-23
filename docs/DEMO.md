@@ -65,17 +65,17 @@ Then mention that the project is open source, containerized for repeatable insta
 
 ## Final evidence package
 
-The release browser suite deliberately captures only genuine IRIS states. For the currently validated release, use the `browser-evidence-35744656238` artifact from runtime acceptance run 72 as the authoritative source for images 1–4 below. Use the separate `release-validation-35744656238` artifact for the smoke-test proof. Both artifacts are retained by GitHub Actions until 2026-10-06; package the final submission evidence before that date.
+The release browser suite deliberately captures only genuine IRIS states. For the currently validated release, use the `browser-evidence-35834262463` artifact from runtime acceptance run 75 as the authoritative source for images 1–4 below. Use the separate `release-validation-35834262463` artifact for the smoke-test proof. Both artifacts are retained by GitHub Actions until 2026-10-07; package the final submission evidence before that date.
 
 1. `01-real-catalogue.png` — catalogue with discovered IRIS services visible.
 2. `02-real-selected-service.png` — selected service with live IRIS metadata.
 3. `03-real-openapi-explorer.png` — the first-party Control Center OpenAPI contract rendered by the explorer.
 4. `04-real-safe-get.png` — successful first-party `/health` GET executed through the production request proxy, including status/timing/result.
-5. `release-validation-35744656238` transcript — select or render the final section showing the clean smoke/release validation passing. Do not substitute an edited terminal result or fixture-backed screenshot.
+5. `release-validation-35834262463` transcript — select or render the final section showing the clean smoke/release validation passing. Do not substitute an edited terminal result or fixture-backed screenshot.
 
 Before publication, inspect every selected image for browser chrome, account names, cookies, authorization data, local/private infrastructure names, or any other information that should not become public. The automated repository guard does not inspect screenshot pixels.
 
-If a fresh final validation supersedes run 72, use all browser images and the validation transcript from the same newer successful runtime run and update `RELEASE_EVIDENCE.md`; do not mix evidence from different release candidates unless the provenance is explicitly documented.
+If a fresh final validation supersedes run 75, use all browser images and the validation transcript from the same newer successful runtime run and update `RELEASE_EVIDENCE.md`; do not mix evidence from different release candidates unless the provenance is explicitly documented.
 
 ## Fresh public-checkout rehearsal
 
