@@ -22,14 +22,40 @@ jobs:
       # digest prevents a registry tag update from silently changing the runtime
       # under test.
       IRIS_IMAGE: intersystems/iris-community:2026.1@sha256:c57b65b2b454494091e7b3e49f6a53b3335f40adf475bcfcee0866083f35a7c2
-      # A run-specific throwaway credential avoids storing a repository secret.
-      # It exists only inside the disposable CI instance.
-      IRIS_PASSWORD: ${{ format('CI-{0}-Aa1!', github.run_id) }}
       CONTAINER_HEALTH_TIMEOUT: 300
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Generate and mask disposable runtime credential
+        shell: bash
+        run: |
+          runtime_credential="$(openssl rand -hex 24)Aa1!"
+          echo "::add-mask::$runtime_credential"
+          printf 'IRIS_PASSWORD=%s\n' "$runtime_credential" >> "$GITHUB_ENV"
+
+      - name: Clone public repository without credentials
+        shell: bash
+        env:
+          VALIDATION_REPOSITORY: ${{ github.repository }}
+          VALIDATION_SHA: ${{ github.sha }}
+          GIT_CONFIG_NOSYSTEM: '1'
+          GIT_CONFIG_GLOBAL: /dev/null
+          GIT_TERMINAL_PROMPT: '0'
+        run: |
+          git -c credential.helper= clone --no-checkout "https://github.com/$VALIDATION_REPOSITORY.git" .
+          git -c credential.helper= fetch origin "$VALIDATION_SHA"
+          git checkout --detach "$VALIDATION_SHA"
+          test "$(git rev-parse HEAD)" = "$VALIDATION_SHA"
+
+      - name: Rehearse README installation from public checkout
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            printf 'Public checkout commit: %s\n' "$(git rev-parse HEAD)"
+            docker compose up --build -d
+            ./scripts/smoke-test.sh
+            echo 'Fresh public-checkout README installation passed.'
+          } 2>&1 | tee public-install-validation.log
 
       - name: Run clean release validation
         # Keep the complete non-secret transcript as release evidence. The
@@ -44,7 +70,9 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: release-validation-${{ github.run_id }}
-          path: release-validation.log
+          path: |
+            release-validation.log
+            public-install-validation.log
           if-no-files-found: warn
           retention-days: 14
 

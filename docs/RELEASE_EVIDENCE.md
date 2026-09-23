@@ -67,9 +67,9 @@ The authoritative final screenshot set is the five-image checklist in `DEMO.md`.
 - [x] Automated repository guard checks committed content for credential/private-information patterns in CI. Static checks run 145 validates the hardened guard, including common credential/key filenames and embedded private-key material.
 - [x] Final human review of the retained release screenshots found no visible credentials, account identity, cookies, authorization data, or private infrastructure information before publication.
 - [x] Known limitations reviewed for accuracy and documented explicitly in the README on `fd1af7e`.
-- [ ] Repository made publicly accessible as required by the contest.
+- [x] Repository publicly accessible; anonymous clone verified on 2026-09-23 at `ef591f245f56cd1595dcae2d46b3fb59ed086f3d`.
 
-Evidence/notes: Runtime acceptance run 71 produced the final retained `browser-evidence-35731282996` and `release-validation-35731282996` artifacts. The browser artifact contains the complete genuine-IRIS browser story: catalogue, selected-service metadata, first-party OpenAPI exploration and successful first-party safe GET execution. The release-validation artifact preserves the complete successful clean validation transcript and its genuine exit status. The first browser attempt on run 71 timed out waiting for the real `/health` result while the IRIS stack remained healthy; a retry completed successfully and produced the final evidence artifact above. Fixture-backed states remain excluded from live-IRIS demo claims. The repository is currently private, so public-repository contest compliance is not yet satisfied.
+Evidence/notes: Runtime acceptance run 71 produced the final retained `browser-evidence-35731282996` and `release-validation-35731282996` artifacts. The browser artifact contains the complete genuine-IRIS browser story: catalogue, selected-service metadata, first-party OpenAPI exploration and successful first-party safe GET execution. The release-validation artifact preserves the complete successful clean validation transcript and its genuine exit status. The first browser attempt on run 71 timed out waiting for the real `/health` result while the IRIS stack remained healthy; a retry completed successfully and produced the final evidence artifact above. Fixture-backed states remain excluded from live-IRIS demo claims. The repository is now public. The fresh public-checkout installation gate remains open until the new rehearsal has passed.
 
 ## Release decision
 
@@ -77,4 +77,12 @@ Runtime validation status: **PASSED on `e2b4b92` / IRIS Community 2026.1, includ
 
 Contest-release status: **NOT YET READY FOR FINAL SUBMISSION**
 
-Remaining gates are the fresh public-checkout installation rehearsal and public repository availability. Contest submission and acceptance of contest/legal terms remain owner actions.
+The remaining technical gate is the fresh public-checkout installation rehearsal. Contest submission and acceptance of contest/legal terms remain owner actions.
+
+## Public HEAD verification — 2026-09-23
+
+Anonymous clone of public HEAD `ef591f245f56cd1595dcae2d46b3fb59ed086f3d` succeeded. Local JavaScript syntax, UI integrity, ObjectScript contracts, shell syntax and documentation links passed. No application source changes were needed.
+
+The same HEAD passed [runtime run 72](https://github.com/mrtandmilo/iris-control-center/actions/runs/35744656238) and [static run 146](https://github.com/mrtandmilo/iris-control-center/actions/runs/35744656301). Runtime logs confirm clean compilation, smoke acceptance and Chromium acceptance with 12 discovered services. The current HEAD artifacts supersede the historical run 71 package above: browser artifact `10702911443` and validation transcript artifact `10702921382`, retained until 2026-10-06. Their screenshots still require review before publication.
+
+The local verification host has no Docker installation, so no new local runtime success is claimed. The runtime workflow now performs an anonymous checkout and README installation/smoke rehearsal before the clean release gate. It also generates and masks a random disposable password before exporting it; the previous job-wide value appeared in GitHub step environment logs. Historical disposable instances were torn down after their runs.

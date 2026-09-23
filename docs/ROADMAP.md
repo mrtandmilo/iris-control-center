@@ -37,7 +37,7 @@
 - [x] Automated secret/private-information guard in CI
 - [ ] Capture the five final evidence images defined in `DEMO.md`: catalogue, selected-service metadata, OpenAPI explorer, successful safe GET, and passing smoke test
 - [ ] Reproduce README installation from the final public checkout
-- [ ] Make the repository public
+- [x] Make the repository public (anonymous clone verified 2026-09-23)
 - [ ] Optional: publish a demo video if pursuing the announced video bonus
 - [ ] Owner approval and final contest submission
 
