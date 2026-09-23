@@ -30,6 +30,9 @@ try {
 
   assert(await page.locator('#filter').getAttribute('placeholder') === 'Filter services…', 'UTF-8 HTML text was corrupted during asset delivery.');
 
+  const deliveredScript = await page.evaluate(async () => (await fetch('/iris-control-center/app.js')).text());
+  assert(deliveredScript.includes('Loading API definition…'), 'UTF-8 JavaScript text was corrupted during asset delivery.');
+
   const apiCatalogue = await page.evaluate(async () => {
     const response = await fetch('/iris-control-center/api/services');
     if (!response.ok) throw new Error(`services API returned ${response.status}`);
