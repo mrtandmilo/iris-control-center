@@ -1,80 +1,50 @@
 # Release validation evidence
 
-This record tracks the final contest release. Do not record passwords, tokens, cookies, authorization headers, registry credentials, or other secrets here.
+## Validated public release candidate — 2026-09-23
 
-## Environment
+- Original public main HEAD: `ef591f245f56cd1595dcae2d46b3fb59ed086f3d`; anonymous clone succeeded without Git credentials.
+- Corrected source revision: `3b3edee6616185b8364ea31fce77e7273c1b6c30` in [PR #1](https://github.com/mrtandmilo/iris-control-center/pull/1).
+- Exact checked-out and runtime-tested PR merge revision: `7b18318d84ea8d8f1088fdc5f55e3e9fe2302d61`.
+- [Runtime acceptance run 75](https://github.com/mrtandmilo/iris-control-center/actions/runs/35834262463): **PASSED**.
+- [Static checks](https://github.com/mrtandmilo/iris-control-center/actions/runs/35834262381): **PASSED**.
+- Runtime: IRIS Community 2026.1 on a GitHub-hosted Ubuntu runner.
+- Image: `intersystems/iris-community:2026.1@sha256:c57b65b2b454494091e7b3e49f6a53b3335f40adf475bcfcee0866083f35a7c2`.
+- Resolved image ID: `sha256:cea94d88bfa91557c5fabba5221e19bbdd4e87c5f8ecc9e10e990789df4e8d64`.
 
-- Validation date (UTC): 2026-09-22
-- Runtime-validated commit SHA: `e2b4b926a4f99308c449be3b1aa5c32a8c7912f5`
-- IRIS Community release: 2026.1
-- GitHub Actions runtime acceptance: **passed** (run 71)
-- GitHub Actions static checks: **passed** (run 145)
-- Real Chromium acceptance: **passed** as part of runtime acceptance run 71
-- Browser evidence artifact: `browser-evidence-35731282996` (artifact `10698386131`, retained by GitHub Actions until 2026-10-06)
-- Release-validation transcript artifact: `release-validation-35731282996` (artifact `10698204624`, retained by GitHub Actions until 2026-10-06)
-- Host tooling/OS details: not retained in repository evidence; reproduce during final clean-checkout validation
+The local verification Mac has no Docker installation. Runtime execution was therefore performed in CI, not claimed as a local run. The workflow explicitly clones the public repository anonymously and checks out the exact tested revision before installation.
 
-## Clean build and installation
+## Installation and tests
 
-- [x] Clean IRIS Community 2026.1 image build completed.
-- [x] Container reached a healthy IRIS state.
-- [x] Setup imported and compiled all four application classes without errors.
-- [x] `/iris-control-center` was enabled and authenticated UI assets were delivered.
-- [x] `/iris-control-center/api` was enabled and authenticated API readiness passed.
+- [x] Public repository access and MIT license verified.
+- [x] Fresh anonymous checkout, README Compose build/start and authenticated smoke suite passed.
+- [x] Disposable stack and data volume removed before a separate no-cache release build.
+- [x] All four ObjectScript classes compiled; container became healthy.
+- [x] All ten smoke checks passed, including authentication, assets, health, native discovery, input validation, traversal protection and unknown-service isolation.
+- [x] Chromium catalogue count (12 services), filtering, keyboard selection, metadata and refresh passed.
+- [x] Genuine first-party OpenAPI and `/health` GET through the production proxy passed.
+- [x] Response rendering, parameter encoding, required parameters and inspect-only mutation controls passed. Deeper parameter cases use a browser fixture; release screenshots do not.
+- [x] UTF-8 HTML placeholder and delivered JavaScript text passed browser assertions.
+- [x] JavaScript syntax, shell syntax, UI/ObjectScript contracts, local Markdown links, fail-fast guards, Compose configuration and tracked-file credential guards passed.
 
-Evidence/notes: The first fully clean runtime acceptance was established on `b821bac`. Subsequent documentation, accessibility, security, contest-packaging, browser-acceptance, publication-safety, first-party OpenAPI, genuine safe-GET evidence and deterministic demo-packaging hardening culminated in `e2b4b92`, whose runtime-acceptance and static-check workflows both completed successfully. Earlier misleading green runs were rejected because build output still contained an ObjectScript compilation error; those runs are not treated as release evidence.
+## Retained evidence
 
-## Automated runtime validation
+Use all files from runtime run 75 together:
 
-- [x] `scripts/smoke-test.sh` completed successfully against the clean instance.
-- [x] Health contract passed.
-- [x] Native service-discovery contract passed.
-- [x] OpenAPI validation/error-isolation checks passed.
-- [x] GET request-proxy validation checks passed.
-- [x] Traversal/security regression checks passed.
-- [x] Unknown-service isolation passed.
-- [x] Authenticated UI, JavaScript and CSS delivery passed.
+- [Browser evidence](https://github.com/mrtandmilo/iris-control-center/actions/runs/35834262463/artifacts/10739075108): `01-real-catalogue.png`, `02-real-selected-service.png`, `03-real-openapi-explorer.png`, `04-real-safe-get.png`.
+- [Validation transcripts](https://github.com/mrtandmilo/iris-control-center/actions/runs/35834262463/artifacts/10737699543): `public-install-validation.log` and `release-validation.log`.
+- Browser ZIP SHA-256: `bee843e38121304fc847332a93d1eb5fdb7ea20a7bf236b869640fa023492cbe`.
+- Transcript ZIP SHA-256: `75eaa541a5bacf4f3210c02604aef422068bfcef19aabc07ad22bf2c7c834e51`.
 
-Evidence/notes: The clean acceptance suite reaches all 10 runtime checks successfully on IRIS Community 2026.1. Runtime acceptance run 71 also retains the complete clean release-validation transcript as a dedicated artifact, preserving the validator's real exit status without retaining the run-specific IRIS password.
+Both archives were downloaded and their hashes verified. All four screenshots were visually inspected: no visible credentials, account identity, cookies, authorization data or private infrastructure details were found. The selected-service image captures metadata while its API definition is loading; the separate explorer and GET images show completed real operations. Both unmodified transcripts were reviewed and retained with the screenshots. GitHub's 14-day retention expires on 2026-10-07; preserve the package before then.
 
-## Browser acceptance
+## Justified corrections
 
-- [x] Service catalogue loads and count matches the API response.
-- [x] Catalogue filtering works, including the empty-result state.
-- [x] Service metadata renders correctly.
-- [x] Keyboard selection and selected-service `aria-pressed` state verified in real Chromium.
-- [x] Refresh re-runs discovery without a page reload.
-- [x] OpenAPI explorer reaches a terminal state for the first-party Control Center API and endpoint filtering is exercised.
-- [x] GET path/query parameter composition and URL encoding verified end-to-end in the browser fixture.
-- [x] Required path parameters block incomplete requests in the browser.
-- [x] A deterministic read-only GET executes successfully from the browser explorer through the request proxy.
-- [x] Response status, timing, headers and formatted JSON body render after browser execution.
-- [x] Mutating POST operations remain inspect-only in the browser.
+Public verification added an anonymous installation rehearsal and replaced a job-wide predictable disposable credential with a random credential masked before export. Historical disposable runtimes were torn down. Documentation now references the correct evidence and does not claim the smoke suite has a password default.
 
-Evidence/notes: `scripts/browser-acceptance.mjs` runs headless Chromium against the validated IRIS instance. The Control Center advertises its own first-party OpenAPI 3.0 contract, making real explorer rendering deterministic on every clean installation. Runtime acceptance run 71 drives the discovered first-party `/health` GET through the production request proxy and captures the genuine result. The interaction harness still uses a deterministic in-browser fixture only for deeper parameter-encoding and mutation-safety cases; fixture-backed states are deliberately not captured as release screenshots.
-
-## Contest/demo evidence
-
-The authoritative final screenshot set is the five-image checklist in `DEMO.md`.
-
-- [x] Real-IRIS service catalogue browser evidence captured automatically.
-- [x] Real-IRIS selected-service metadata browser evidence captured automatically.
-- [x] OpenAPI explorer final evidence captured from the real first-party Control Center API as `03-real-openapi-explorer.png` in the browser evidence artifact.
-- [x] Successful safe GET final evidence captured against the real first-party `/health` operation as `04-real-safe-get.png` in `browser-evidence-35731282996`.
-- [x] Passing smoke-test evidence retained as the complete `release-validation-35731282996` transcript artifact from runtime acceptance run 71; convert/select the final presentation image during demo packaging.
-- [ ] README installation steps reproduced from a fresh public checkout.
-- [x] README/demo local links checked automatically by `scripts/check-markdown-links.mjs`; static checks run 145 passed on `e2b4b92`.
-- [x] Automated repository guard checks committed content for credential/private-information patterns in CI. Static checks run 145 validates the hardened guard, including common credential/key filenames and embedded private-key material.
-- [x] Final human review of the retained release screenshots found no visible credentials, account identity, cookies, authorization data, or private infrastructure information before publication.
-- [x] Known limitations reviewed for accuracy and documented explicitly in the README on `fd1af7e`.
-- [ ] Repository made publicly accessible as required by the contest.
-
-Evidence/notes: Runtime acceptance run 71 produced the final retained `browser-evidence-35731282996` and `release-validation-35731282996` artifacts. The browser artifact contains the complete genuine-IRIS browser story: catalogue, selected-service metadata, first-party OpenAPI exploration and successful first-party safe GET execution. The release-validation artifact preserves the complete successful clean validation transcript and its genuine exit status. The first browser attempt on run 71 timed out waiting for the real `/health` result while the IRIS stack remained healthy; a retry completed successfully and produced the final evidence artifact above. Fixture-backed states remain excluded from live-IRIS demo claims. The repository is currently private, so public-repository contest compliance is not yet satisfied.
+Visual review also found corrupted UTF-8 punctuation in HTML. The UI now explicitly decodes UTF-8 files and sets the response character set consistently for HTML, JavaScript, CSS and JSON. An intermediate revision failed browser acceptance and was not accepted as evidence; run 75 validates the complete correction.
 
 ## Release decision
 
-Runtime validation status: **PASSED on `e2b4b92` / IRIS Community 2026.1, including first-party OpenAPI exploration, genuine safe-GET browser execution, complete interactive Chromium acceptance, retained clean validation transcript, deterministic demo packaging and hardened publication-safety checks**
+**Technical validation passed for the exact candidate above.** Documentation-only updates to this record do not change the tested application. Subsequent source changes must pass the same gates.
 
-Contest-release status: **NOT YET READY FOR FINAL SUBMISSION**
-
-Remaining gates are the fresh public-checkout installation rehearsal and public repository availability. Contest submission and acceptance of contest/legal terms remain owner actions.
+No contest submission, terms acceptance, identity information or payment was performed. Final contest eligibility and approval belong to the organisers; owner approval is still required before submission or accepting any terms.

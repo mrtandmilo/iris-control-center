@@ -71,14 +71,14 @@ Do not describe the application as tested until every applicable item in `docs/T
 
 Before submission:
 
-- [ ] Confirm the repository is publicly accessible.
-- [ ] Confirm the application is open source and the MIT license is present.
-- [ ] Validate a clean installation against IRIS Community Edition from the public repository.
-- [ ] Run the complete runtime checklist in `docs/TESTING.md` and capture the tested IRIS version.
-- [ ] Verify the English README contains working installation steps and an accurate description/demo of the application.
-- [ ] Add final screenshots and/or demo media that reflect the tested build.
-- [ ] Verify README and documentation links from a clean checkout.
-- [ ] Perform a final credentials/secrets and generated-artifact review.
+- [x] Confirm the repository is publicly accessible.
+- [x] Confirm the application is open source and the MIT license is present.
+- [x] Validate a clean installation against IRIS Community Edition from the public repository.
+- [x] Run the complete runtime checklist in `docs/TESTING.md` and capture the tested IRIS version.
+- [x] Verify the English README contains working installation steps and an accurate description/demo of the application.
+- [x] Add final screenshots and/or demo media that reflect the tested build.
+- [x] Verify README and documentation links from a clean checkout.
+- [x] Perform a final credentials/secrets and generated-artifact review.
 - [ ] Confirm any Open Exchange/contest-registration requirements and current competition terms at the official source immediately before submission.
 - [ ] Obtain the repository owner’s explicit approval before accepting contest terms or making the final submission.
 

@@ -15,8 +15,10 @@ ClassMethod Send(filename As %String, contentType As %String) As %Status [ Priva
 {
     Try {
         Set stream = ##class(%Stream.FileCharacter).%New()
+        Set stream.TranslateTable = "UTF8"
         Set stream.Filename = "/home/irisowner/dev/web/"_filename
         Set %response.ContentType = contentType
+        Set %response.CharSet = "utf-8"
         Do stream.Rewind()
         While 'stream.AtEnd { Write stream.Read(32767) }
     } Catch ex {
