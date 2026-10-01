@@ -1,6 +1,6 @@
 # Contest submission preparation
 
-This document keeps the final InterSystems Programming Contest entry accurate and reproducible. It is a preparation aid, not a submitted entry.
+This document records the submitted InterSystems Programming Contest entry and keeps its evaluator-facing claims accurate and reproducible during the voting period.
 
 ## Project summary
 
@@ -79,7 +79,7 @@ Before submission:
 - [x] Add final screenshots and/or demo media that reflect the tested build.
 - [x] Verify README and documentation links from a clean checkout.
 - [x] Perform a final credentials/secrets and generated-artifact review.
-- [ ] Confirm any Open Exchange/contest-registration requirements and current competition terms at the official source immediately before submission.
-- [ ] Obtain the repository owner’s explicit approval before accepting contest terms or making the final submission.
+- [x] Open Exchange/contest registration completed and the application is listed in the official contest.
+- [x] Repository owner approved and completed the contest submission.
 
-The technical release can be prepared without accepting competition terms. Registration, identity verification if later required for a prize, and the final contest submission remain owner-controlled actions.
+The technical release can be prepared without accepting competition terms. The contest submission is complete. Any later identity, payment or prize-acceptance steps remain owner-controlled actions.
