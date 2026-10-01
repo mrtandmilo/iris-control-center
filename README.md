@@ -6,6 +6,12 @@ Built for the 2026 InterSystems Programming Contest **Build Your Own Management 
 
 **Contest task / idea:** [Build Your Own Management Portal — manage web apps and explore REST APIs](https://community.intersystems.com/post/intersystems-programming-contest-build-your-own-management-portal)
 
+## Watch the demo
+
+[Watch the 90-second IRIS Control Center demo on YouTube](https://youtu.be/8UxUOaP0gDo) — **Discover → understand → exercise → diagnose.**
+
+This captioned screenshot walkthrough uses genuine IRIS Community 2026.1 runtime evidence captured on 23 September 2026. It shows REST service discovery, service metadata, OpenAPI exploration and a successful `/health` GET. The video is unlisted and viewable by anyone with the link. The new Windows PowerShell path still requires execution validation.
+
 ## Why it exists
 
 IRIS Control Center makes REST service discovery and API exploration faster and clearer than moving between multiple management screens. The contest release focuses on **managing awareness of web apps and exploring REST APIs**: discover what is available, understand its contract, and safely exercise read-only operations from one screen.
