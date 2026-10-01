@@ -18,6 +18,27 @@ This is the short, repeatable demonstration path for judges and reviewers. It is
 4. Open `http://localhost:52773/iris-control-center/` and authenticate to IRIS if prompted.
 5. Use only non-sensitive local test data. Never display real credentials, tokens, customer data, or private infrastructure details.
 
+## 90-second judge/video script
+
+Use this version when attention is limited or for a short public video.
+
+**0:00–0:15 — Problem**  
+“IRIS Control Center gives developers one safe workspace to discover the REST services actually registered in an IRIS instance, understand their contracts and exercise read-only operations.”
+
+**0:15–0:35 — Discover**  
+Show the live catalogue, filter it, select a service and point out its namespace, dispatch class, web-application path and required resource. Emphasize that this inventory comes from IRIS itself rather than a hard-coded list.
+
+**0:35–0:55 — Understand**  
+Open the advertised OpenAPI contract. Show paths, methods and parameters together with the IRIS service metadata.
+
+**0:55–1:15 — Exercise safely**  
+Run a known GET operation. Show validation, HTTP status, timing and the formatted response. Point out that POST/PUT/PATCH/DELETE remain inspect-only and that execution is constrained to discovered local IRIS applications.
+
+**1:15–1:30 — Proof**  
+Close with: “The release is open source, starts with Docker Compose, and has been validated from an anonymous checkout against pinned IRIS Community 2026.1 with runtime, browser and security acceptance tests.”
+
+**Judge takeaway:** **Discover → understand → exercise → diagnose**, with IRIS authentication and deliberately bounded execution throughout.
+
 ## Three-minute story
 
 ### 0:00–0:30 — The problem
