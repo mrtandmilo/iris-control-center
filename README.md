@@ -63,7 +63,31 @@ After IRIS is healthy, open:
 http://localhost:52773/iris-control-center/
 ```
 
+For the repository's default Docker Compose configuration, authenticate with:
+
+```text
+Username: _SYSTEM
+Password: SYS
+```
+
+If you set `IRIS_PASSWORD` before starting Compose, use that password instead. The browser's HTTP Basic Authentication prompt is expected: the UI and API are protected by IRIS authentication. If the page does not load, first run `docker compose ps` and confirm the `iris` service reports **healthy**, then inspect `docker compose logs iris`.
+
 The UI and API are protected by IRIS password authentication. The API is mounted separately at `/iris-control-center/api`. Credentials and authorization headers are not stored by the browser application.
+
+
+### Windows / PowerShell quick validation
+
+The application itself runs in Docker and is cross-platform; the Bash scripts under `scripts/` are maintainer/CI release tooling and are **not required to use the demo**. On Windows, after `docker compose up --build -d`, use PowerShell:
+
+```powershell
+$pair = '_SYSTEM:SYS'
+$token = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($pair))
+$headers = @{ Authorization = "Basic $token"; Accept = 'application/json' }
+Invoke-RestMethod -Uri 'http://localhost:52773/iris-control-center/api/health' -Headers $headers
+Invoke-RestMethod -Uri 'http://localhost:52773/iris-control-center/api/services' -Headers $headers
+```
+
+If you supplied a custom `IRIS_PASSWORD`, replace `SYS` above. A successful health request returns `status: ok`; the services request returns the discovered catalogue. Then open `http://localhost:52773/iris-control-center/` in a browser and use the same credentials.
 
 ## Architecture
 
