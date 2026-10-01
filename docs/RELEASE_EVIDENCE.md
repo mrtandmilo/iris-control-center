@@ -1,5 +1,16 @@
 # Release validation evidence
 
+## Windows PowerShell client validation — 2026-10-01
+
+- Tested revision: `0cd8c5996854f92cf63f731684154baa977d4d53`.
+- [Windows PowerShell smoke run](https://github.com/mrtandmilo/iris-control-center/actions/runs/36926224662): **PASSED**, including both jobs and cleanup.
+- Client: GitHub-hosted Windows Server 2022 (`10.0.20348`), PowerShell **7.6.6** and Windows PowerShell **5.1.20348.5622**.
+- Both shells executed the unchanged `scripts/smoke-test.ps1` against a genuine disposable Linux-hosted IRIS container. Both health contract checks and live service-discovery checks passed; **12 services** were reported in each shell.
+- [Sanitized transcript artifact](https://github.com/mrtandmilo/iris-control-center/actions/runs/36926224662/artifacts/11193253818), ZIP SHA-256: `b11482bcfd5ab6036bee532022153810d7d280453d325ba538693ea638c3bf88`.
+- A temporary authenticated HTTPS connection exposed only the two read-only health/discovery endpoints. Connection details were encrypted to an ephemeral Windows key, and credentials were masked. The connection and disposable container were removed after testing.
+- **Scope:** proves Windows PowerShell client compatibility with the live IRIS API. It does **not** validate Docker Desktop installation, Compose startup on Windows, or a Windows browser walkthrough. Those remain separate end-to-end checks.
+
+
 ## Validated public release candidate — 2026-09-23
 
 - Original public main HEAD: `ef591f245f56cd1595dcae2d46b3fb59ed086f3d`; anonymous clone succeeded without Git credentials.
