@@ -30,6 +30,25 @@ docker compose up
 5. Confirm `/iris-control-center` and `/iris-control-center/api` exist as enabled web applications.
 6. Open `http://localhost:52773/iris-control-center/` and authenticate with an IRIS account authorized to use the application.
 
+## Windows evaluator path
+
+The application does **not** require Bash to run. The Bash scripts below are the project's full maintainer/CI release gates. Windows evaluators can validate the running application directly from PowerShell after `docker compose up --build -d`.
+
+With the default Compose password:
+
+```powershell
+$pair = '_SYSTEM:SYS'
+$token = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($pair))
+$headers = @{ Authorization = "Basic $token"; Accept = 'application/json' }
+
+Invoke-RestMethod -Uri 'http://localhost:52773/iris-control-center/api/health' -Headers $headers
+Invoke-RestMethod -Uri 'http://localhost:52773/iris-control-center/api/services' -Headers $headers
+```
+
+Replace `SYS` if `IRIS_PASSWORD` was overridden. Then browse to `http://localhost:52773/iris-control-center/` and authenticate with `_SYSTEM` and the same password. The browser authentication prompt is expected.
+
+This short Windows path validates readiness and live service discovery. The complete ten-check security/release suite remains automated in CI and its successful run is linked from `RELEASE_EVIDENCE.md`.
+
 ## Automated smoke test
 
 After starting the container, prompt for the IRIS password so it is not written into shell history, then execute the suite:
