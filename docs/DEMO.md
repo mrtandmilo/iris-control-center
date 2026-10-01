@@ -15,7 +15,7 @@ This is the short, repeatable demonstration path for judges and reviewers. It is
    ```
 
    Do not record a demo until it passes. The smoke script always requires an explicit IRIS_PASSWORD; it has no default password.
-4. Open `http://localhost:52773/iris-control-center/` and authenticate to IRIS if prompted.
+4. Open `http://localhost:52773/iris-control-center/`. With the repository's default Compose configuration, authenticate with username `_SYSTEM` and password `SYS`. If `IRIS_PASSWORD` was overridden when Compose was started, use that password instead. The browser authentication prompt is expected.
 5. Use only non-sensitive local test data. Never display real credentials, tokens, customer data, or private infrastructure details.
 
 ## 90-second judge/video script
@@ -38,6 +38,10 @@ Run a known GET operation. Show validation, HTTP status, timing and the formatte
 Close with: “The release is open source, starts with Docker Compose, and has been validated from an anonymous checkout against pinned IRIS Community 2026.1 with runtime, browser and security acceptance tests.”
 
 **Judge takeaway:** **Discover → understand → exercise → diagnose**, with IRIS authentication and deliberately bounded execution throughout.
+
+### Windows reviewers
+
+You do not need Bash to run or evaluate the application. Start it with Docker Desktop / PowerShell using `docker compose up --build -d`, wait until `docker compose ps` reports the service healthy, then follow the browser path above. A native PowerShell health/service-discovery check is provided in [TESTING.md](TESTING.md#Windows-evaluator-path). The Bash smoke/release scripts are maintainer/CI tooling, not a prerequisite for the demo.
 
 ## Three-minute story
 
