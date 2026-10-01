@@ -2,6 +2,12 @@
 
 This is the short, repeatable demonstration path for judges and reviewers. It is designed to show the product value in roughly three minutes without relying on hidden setup.
 
+## Watch the demo
+
+[Watch the 90-second IRIS Control Center demo on YouTube](https://youtu.be/8UxUOaP0gDo) — **Discover → understand → exercise → diagnose.**
+
+This captioned screenshot walkthrough uses genuine IRIS Community 2026.1 runtime evidence captured on 23 September 2026. It shows REST service discovery, service metadata, OpenAPI exploration and a successful `/health` GET. The video is unlisted and viewable by anyone with the link. The new Windows PowerShell path still requires execution validation.
+
 ## Before recording or presenting
 
 1. Start the application with `docker compose up --build`.
