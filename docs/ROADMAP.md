@@ -30,7 +30,7 @@
 - [x] Runtime smoke tests for discovery, OpenAPI and request-proxy security contracts
 - [x] Real Chromium acceptance for catalogue, explorer and interactive GET execution
 
-## Phase 5 — contest packaging — in progress
+## Phase 5 — contest packaging — submitted; voting-period polish in progress
 - [x] Final README and architecture documentation
 - [x] Open Exchange metadata draft
 - [x] Submission checklist and evaluator-focused demo script
@@ -39,11 +39,11 @@
 - [x] Reproduce README installation from an anonymous public checkout (runtime run 75)
 - [x] Make the repository public (anonymous clone verified 2026-09-23)
 - [ ] Optional: publish a demo video if pursuing the announced video bonus
-- [ ] Owner approval and final contest submission
+- [x] Owner approval and final contest submission
 
 ## Release boundary
 
-The application implementation and automated technical acceptance are complete for the contest scope. Remaining items are release/publication evidence and owner-controlled submission actions; they should not be represented as completed until they actually occur.
+The application implementation and automated technical acceptance are complete for the contest scope. The entry is submitted. Remaining work is limited to low-risk voting-period presentation, evidence preservation and optional bonus deliverables; core scope remains frozen.
 
 The evidence package is intentionally defined once in `DEMO.md`; this roadmap tracks completion of that set rather than maintaining a competing screenshot count.
 
