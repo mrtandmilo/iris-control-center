@@ -6,7 +6,7 @@ This is the short, repeatable demonstration path for judges and reviewers. It is
 
 [Watch the 90-second IRIS Control Center demo on YouTube](https://youtu.be/8UxUOaP0gDo) — **Discover → understand → exercise → diagnose.**
 
-This captioned screenshot walkthrough uses genuine IRIS Community 2026.1 runtime evidence captured on 23 September 2026. It shows REST service discovery, service metadata, OpenAPI exploration and a successful `/health` GET. The video is unlisted and viewable by anyone with the link. The new Windows PowerShell path still requires execution validation.
+This captioned screenshot walkthrough uses genuine IRIS Community 2026.1 runtime evidence captured on 23 September 2026. It shows REST service discovery, service metadata, OpenAPI exploration and a successful `/health` GET. The video is unlisted and viewable by anyone with the link. At the time of recording, Windows PowerShell execution was unverified. It has since passed on Windows Server 2022 in Windows PowerShell 5.1 and PowerShell 7 against a disposable Linux-hosted IRIS container; Windows Docker Desktop installation remains unverified. See [release evidence](RELEASE_EVIDENCE.md).
 
 ## Before recording or presenting
 
