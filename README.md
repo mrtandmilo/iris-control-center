@@ -23,6 +23,32 @@ IRIS Control Center makes REST service discovery and API exploration faster and 
 - Restrict request execution to discovered local IRIS web applications.
 - Provide a reproducible IRIS Community 2026.1 container build with automated ObjectScript import and application setup.
 
+## For contest judges
+
+**Three-minute evaluation path:** **Discover → understand → exercise → diagnose.**
+
+1. Start from a clean checkout with `docker compose up --build`.
+2. Open the Control Center and select a REST service discovered directly from IRIS.
+3. Inspect its namespace, dispatch class, web-application metadata and advertised OpenAPI contract in one place.
+4. Choose a read-only GET operation, supply any required parameters and execute it against the selected local IRIS application.
+5. Review the HTTP status, timing and formatted response. Mutating operations remain visible for API understanding but deliberately cannot be executed from the contest UI.
+
+### Evidence against the judging criteria
+
+| Criterion | What to evaluate |
+| --- | --- |
+| **Complexity** | Native IRIS REST-application discovery, metadata normalization, OpenAPI retrieval/parsing, parameter-aware request composition, authenticated local request proxy and explicit security boundaries. |
+| **Clarity of Instructions** | One-command Docker Compose start, pinned IRIS Community 2026.1 runtime, documented architecture, testing and repeatable three-minute demo. |
+| **Developer Experience** | Search/filter → select service → inspect contract → execute safe GET without moving between separate management/configuration/API-testing tools. |
+| **Applicability** | Catalogue is generated from the IRIS instance rather than a hard-coded demo list, so it follows the REST applications actually installed. |
+| **Usability** | Responsive single-page workflow, filtering, keyboard selection, parameter validation, clear loading/error states and formatted responses. |
+
+### Verified release evidence
+
+The contest candidate was validated from an **anonymous public checkout** against a pinned **IRIS Community 2026.1** container. Runtime acceptance passed all ten smoke/security checks plus real Chromium tests covering a 12-service catalogue, filtering, keyboard selection, live IRIS metadata, genuine first-party OpenAPI exploration and a successful `/health` GET through the production request proxy. Static checks also passed. Exact revisions, workflow runs, image digests and retained evidence are recorded in [`docs/RELEASE_EVIDENCE.md`](docs/RELEASE_EVIDENCE.md).
+
+For the shortest reviewer walkthrough, use [`docs/DEMO.md`](docs/DEMO.md). The deliberate GET-only execution boundary is a safety decision, not an incomplete HTTP client: mutating methods can be inspected while execution stays constrained to discovered local IRIS applications.
+
 ## Quick start
 
 Prerequisites: Docker with Compose support and access to the InterSystems IRIS Community image configured by this repository.
