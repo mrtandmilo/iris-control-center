@@ -109,13 +109,13 @@ The clean runtime acceptance suite verifies authenticated UI delivery, browser a
 
 ## Development status
 
-The core contest workflow is implemented and runtime-tested against the pinned InterSystems IRIS Community 2026.1 container: installation, authentication, service discovery, OpenAPI inspection, safe read-only request execution and backend security contracts. Anonymous public-checkout installation, clean release validation and real-browser evidence have passed; see `docs/RELEASE_EVIDENCE.md` for the exact tested revision. Contest submission and acceptance of terms remain subject to separate owner approval.
+The core contest workflow is implemented and runtime-tested against the pinned InterSystems IRIS Community 2026.1 container: installation, authentication, service discovery, OpenAPI inspection, safe read-only request execution and backend security contracts. Anonymous public-checkout installation, clean release validation and real-browser evidence have passed; see `docs/RELEASE_EVIDENCE.md` for the exact tested revision. The contest entry has been submitted and accepted. This repository remains the public, continuously improvable source during the voting period.
 
 ## Contest
 
 The official contest runs September 14–October 4, 2026, but **new submissions close September 27, 2026 at 23:59 EST**. Community voting runs September 28–October 4, and submitted applications may continue to be improved during voting.
 
-The contest scores Complexity, Clarity of Instructions, Developer Experience, Applicability and Usability. IRIS Control Center currently qualifies for the announced **Docker container usage** technology bonus. Additional announced bonuses such as ZPM package deployment, an online demo and a YouTube demo are not claimed until they are actually delivered.
+The contest scores Complexity, Clarity of Instructions, Developer Experience, Applicability and Usability. IRIS Control Center uses Docker container deployment and is listed as a Newcomer entry on the official contest page. Other technology bonuses are not claimed unless their qualifying deliverable is actually present.
 
 Official references:
 
