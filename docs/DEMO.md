@@ -1,6 +1,6 @@
 # IRIS Control Center demo walkthrough
 
-This is the short, repeatable demonstration path for judges and reviewers. It is designed to show the product value in roughly three minutes without relying on hidden setup.
+Explore how IRIS Control Center brings REST service discovery, API documentation and read-only requests into one workspace. The video gives a 90-second overview; the walkthrough below takes roughly three minutes in a running instance.
 
 ## Watch the demo
 
@@ -8,126 +8,50 @@ This is the short, repeatable demonstration path for judges and reviewers. It is
 
 This captioned screenshot walkthrough uses genuine IRIS Community 2026.1 runtime evidence captured on 23 September 2026. It shows REST service discovery, service metadata, OpenAPI exploration and a successful `/health` GET. The video is unlisted and viewable by anyone with the link. At the time of recording, Windows PowerShell execution was unverified. It has since passed on Windows Server 2022 in Windows PowerShell 5.1 and PowerShell 7 against a disposable Linux-hosted IRIS container; Windows Docker Desktop installation remains unverified. See [release evidence](RELEASE_EVIDENCE.md).
 
-## Before recording or presenting
+## Try the demo
 
-1. Start the application with `docker compose up --build`.
-2. Wait for IRIS to become healthy and for the setup script to finish.
-3. Run the smoke suite without placing a password in shell history:
-
-   ```bash
-   read -rsp "IRIS password: " IRIS_PASSWORD; echo
-   IRIS_USER=_SYSTEM IRIS_PASSWORD="$IRIS_PASSWORD" ./scripts/smoke-test.sh
-   unset IRIS_PASSWORD
-   ```
-
-   Do not record a demo until it passes. The smoke script always requires an explicit IRIS_PASSWORD; it has no default password.
-4. Open `http://localhost:52773/iris-control-center/`. With the repository's default Compose configuration, authenticate with username `_SYSTEM` and password `SYS`. If `IRIS_PASSWORD` was overridden when Compose was started, use that password instead. The browser authentication prompt is expected.
-5. Use only non-sensitive local test data. Never display real credentials, tokens, customer data, or private infrastructure details.
-
-## 90-second judge/video script
-
-Use this version when attention is limited or for a short public video.
-
-**0:00–0:15 — Problem**  
-“IRIS Control Center gives developers one safe workspace to discover the REST services actually registered in an IRIS instance, understand their contracts and exercise read-only operations.”
-
-**0:15–0:35 — Discover**  
-Show the live catalogue, filter it, select a service and point out its namespace, dispatch class, web-application path and required resource. Emphasize that this inventory comes from IRIS itself rather than a hard-coded list.
-
-**0:35–0:55 — Understand**  
-Open the advertised OpenAPI contract. Show paths, methods and parameters together with the IRIS service metadata.
-
-**0:55–1:15 — Exercise safely**  
-Run a known GET operation. Show validation, HTTP status, timing and the formatted response. Point out that POST/PUT/PATCH/DELETE remain inspect-only and that execution is constrained to discovered local IRIS applications.
-
-**1:15–1:30 — Proof**  
-Close with: “The release is open source, starts with Docker Compose, and has been validated from an anonymous checkout against pinned IRIS Community 2026.1 with runtime, browser and security acceptance tests.”
-
-**Judge takeaway:** **Discover → understand → exercise → diagnose**, with IRIS authentication and deliberately bounded execution throughout.
+Follow the [README installation guide](../README.md#quick-start) to start the application with `docker compose up --build`. Once IRIS is healthy and setup is complete, open `http://localhost:52773/iris-control-center/`. The browser authentication prompt is expected. The default Compose credentials are username `_SYSTEM` and password `SYS`; if `IRIS_PASSWORD` was overridden at startup, use that password instead.
 
 ### Windows reviewers
 
-You do not need Bash to run or evaluate the application. Start it with Docker Desktop / PowerShell using `docker compose up --build -d`, wait until `docker compose ps` reports the service healthy, then follow the browser path above. A native PowerShell health/service-discovery check is provided in [TESTING.md](TESTING.md#Windows-evaluator-path). The Bash smoke/release scripts are maintainer/CI tooling, not a prerequisite for the demo.
+Docker Compose can be started from PowerShell with `docker compose up --build -d`; `docker compose ps` shows when the service is healthy. The browser walkthrough is the same on Windows. A native [PowerShell health and service-discovery check](TESTING.md#windows-evaluator-path) is also available; Bash is not required to evaluate the application. PowerShell client validation passed on Windows Server 2022, while Docker Desktop installation and the Windows browser walkthrough remain unverified.
 
-## Three-minute story
+## Three-minute walkthrough
 
-### 0:00–0:30 — The problem
+### 0:00–0:30 — A live API inventory
 
-Open IRIS Control Center and explain the goal in one sentence:
+IRIS Control Center turns the REST services registered in an IRIS instance into a searchable, task-focused API workspace. The catalogue comes from IRIS itself rather than a separately maintained, hard-coded list.
 
-> IRIS Control Center turns the REST services registered in an IRIS instance into a searchable, task-focused API workspace.
+### 0:30–1:10 — Discover a service
 
-Point out that the catalogue is discovered from IRIS rather than maintained as a separate hard-coded list.
+The catalogue shows the service count and supports filtering by service name, namespace or web-application path. Selecting a service reveals its web application, namespace, dispatch class and required resource. Together, these details answer “what REST APIs are actually available on this instance?”
 
-### 0:30–1:10 — Discover
+### 1:10–2:00 — Understand its contract
 
-- Show the service count.
-- Filter by a service name, namespace, or web-application path.
-- Select a service.
-- Show its web application, namespace, dispatch class, and required resource.
+For a service with an advertised OpenAPI definition, the explorer displays the API title and version, method counts, paths, endpoint descriptions and path/query parameters. Endpoint filtering helps locate an operation while the IRIS service metadata stays in the same workflow.
 
-Value to emphasize: a developer can quickly answer “what REST APIs are actually available on this instance?” without manually assembling that inventory.
+### 2:00–2:40 — Exercise a read-only GET
 
-### 1:10–2:00 — Understand
+Choose a known read-only GET endpoint, fill its required path/query parameters and run the request. The workbench validates required inputs and displays HTTP status, elapsed time, response headers and formatted JSON or readable text, including status for unsuccessful responses. The recorded example uses the first-party `/health` endpoint through the production request proxy.
 
-- Allow Control Center to load the service's advertised OpenAPI definition.
-- Show the API title/version and method counts.
-- Filter the endpoint list.
-- Expand the story around path/query parameters and endpoint descriptions.
+Execution is limited to GET operations. POST, PUT, PATCH and DELETE remain available for inspection, and requests are constrained to the selected discovered local IRIS web application. IRIS authentication and authorization apply throughout.
 
-Value to emphasize: discovery metadata and API documentation are brought together in one workflow.
+### 2:40–3:00 — From discovery to diagnosis
 
-### 2:00–2:40 — Safely exercise a GET
+**Discover → understand → exercise → diagnose.** The project is open source, uses Docker Compose for repeatable installation and includes smoke, static, runtime, browser and security acceptance checks.
 
-- Choose a known read-only GET endpoint.
-- Fill any required path/query parameters.
-- Run the request.
-- Show HTTP status, elapsed time, response headers, and formatted JSON/text response.
+## Evidence behind the demo
 
-Mention the deliberate safety boundary: the contest workbench executes GET only; mutating methods remain inspect-only. Requests are pinned to the selected local IRIS web application rather than accepting an arbitrary remote host.
+The video uses genuine IRIS states from [runtime acceptance run 75](https://github.com/mrtandmilo/iris-control-center/actions/runs/35834262463), captured on 23 September 2026:
 
-### 2:40–3:00 — Close
+| Evidence | What it shows |
+| --- | --- |
+| `01-real-catalogue.png` | Catalogue with discovered IRIS services. |
+| `02-real-selected-service.png` | Live IRIS service metadata; the API definition is still loading in this image. |
+| `03-real-openapi-explorer.png` | Completed exploration of the first-party Control Center OpenAPI contract. |
+| `04-real-safe-get.png` | Successful first-party `/health` GET through the production proxy, including status, timing and result. |
+| Validation transcripts | Anonymous public-checkout installation and clean smoke/release validation. |
 
-Summarize the workflow:
+The browser images are in `browser-evidence-35834262463`; the transcripts are in `release-validation-35834262463`. GitHub Actions retention for these artifacts expires on 7 October 2026. [Release evidence](RELEASE_EVIDENCE.md) records artifact links, archive hashes, exact tested revisions, the pinned IRIS Community 2026.1 image and validation scope. Deeper parameter tests use a browser fixture; the release screenshots show real IRIS operations.
 
-**Discover → understand → exercise → diagnose.**
-
-Then mention that the project is open source, containerized for repeatable installation, and includes smoke/static checks and explicit runtime-validation evidence.
-
-## Final evidence package
-
-The release browser suite deliberately captures only genuine IRIS states. For the currently validated release, use the `browser-evidence-35834262463` artifact from runtime acceptance run 75 as the authoritative source for images 1–4 below. Use the separate `release-validation-35834262463` artifact for the smoke-test proof. Both artifacts are retained by GitHub Actions until 2026-10-07; package the final submission evidence before that date.
-
-1. `01-real-catalogue.png` — catalogue with discovered IRIS services visible.
-2. `02-real-selected-service.png` — selected service with live IRIS metadata.
-3. `03-real-openapi-explorer.png` — the first-party Control Center OpenAPI contract rendered by the explorer.
-4. `04-real-safe-get.png` — successful first-party `/health` GET executed through the production request proxy, including status/timing/result.
-5. `release-validation-35834262463` transcript — select or render the final section showing the clean smoke/release validation passing. Do not substitute an edited terminal result or fixture-backed screenshot.
-
-Before publication, inspect every selected image for browser chrome, account names, cookies, authorization data, local/private infrastructure names, or any other information that should not become public. The automated repository guard does not inspect screenshot pixels.
-
-If a fresh final validation supersedes run 75, use all browser images and the validation transcript from the same newer successful runtime run and update `RELEASE_EVIDENCE.md`; do not mix evidence from different release candidates unless the provenance is explicitly documented.
-
-## Fresh public-checkout rehearsal
-
-Once repository visibility has been changed by the owner, reproduce the judge path from a new directory rather than relying on the development checkout:
-
-```bash
-cd "$(mktemp -d)"
-git clone https://github.com/mrtandmilo/iris-control-center.git
-cd iris-control-center
-docker compose up --build -d
-docker compose ps
-```
-
-Wait for the IRIS service to become healthy, then run the smoke command from **Before recording or presenting** and follow the README installation path exactly. Record the public commit SHA and outcome in `RELEASE_EVIDENCE.md`. This is the final installation gate because it proves that a judge can start from the public repository alone.
-
-## Screenshots for the submission
-
-Use the five-item evidence package above. Do not recapture fixture-backed states merely to make the screenshots look cleaner. If a new live capture is required, run the full runtime acceptance workflow and take all release screenshots from that validated instance.
-
-Avoid screenshots containing browser password dialogs, terminal command history with credentials, Authorization headers, cookies, or private system information.
-
-## Demo acceptance gate
-
-A polished recording is not evidence of correctness by itself. Before publishing or submitting a demo, complete every release-evidence item in `TESTING.md` and record the exact IRIS Community version used. If any runtime item remains unverified, describe it as a limitation rather than editing around it in the video.
+Recording preparation, evidence preservation and publication checks are documented in the [maintainer release guide](RELEASE_PROCESS.md).

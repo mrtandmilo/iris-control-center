@@ -130,7 +130,7 @@ The clean runtime acceptance suite verifies authenticated UI delivery, browser a
 
 - [`docs/TESTING.md`](docs/TESTING.md) defines the clean-build, API, browser and security release gates.
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) documents application boundaries and security decisions.
-- [`docs/DEMO.md`](docs/DEMO.md) provides a repeatable three-minute judge/reviewer walkthrough and screenshot checklist.
+- [`docs/DEMO.md`](docs/DEMO.md) provides the demo video, a three-minute reviewer walkthrough and evidence references. Recording and evidence checks are in [`docs/RELEASE_PROCESS.md`](docs/RELEASE_PROCESS.md).
 - [`docs/CONTEST_SUBMISSION.md`](docs/CONTEST_SUBMISSION.md) contains the evaluator-focused project summary, demo flow and final submission gate.
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) tracks final contest packaging work.
 
