@@ -120,7 +120,7 @@ jobs:
           # Exclude documentation, smoke-test fixtures, and this workflow itself:
           # the fail-fast tests above intentionally contain obvious dummy
           # password assignments, which must not make the scanner fail.
-          matches="$(git grep -nEi "$pattern" -- ':!docs/*' ':!scripts/smoke-test.sh' ':!.github/workflows/static-checks.yml' || true)"
+          matches="$(git grep -nEi "$pattern" -- ':!docs/*' ':!scripts/smoke-test.sh' ':!.github/workflows/static-checks.yml' ':!.github/workflows/windows-smoke.yml' ':!agentic/tests/*' || true)"
           matches="$(printf '%s\n' "$matches" | grep -Ev 'process\.env\.[A-Za-z_][A-Za-z0-9_]*|Deno\.env\.get\(|os\.environ|os\.getenv\(|ENV\[[^]]+\]|getenv\(|openssl[[:space:]]+rand[[:space:]]+-hex' || true)"
           if [[ -n "$matches" ]]; then
             printf '%s\n' "$matches"
