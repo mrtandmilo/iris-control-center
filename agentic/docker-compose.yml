@@ -1,0 +1,25 @@
+services:
+  iris:
+    build:
+      context: ..
+      dockerfile: agentic/Dockerfile
+      args:
+        IMAGE: ${IRIS_AI_HUB_IMAGE:-iris-community:2026.3.0AI.154.0}
+    init: true
+    ports:
+      - "52773:52773"
+    environment:
+      ISC_DATA_DIRECTORY: /home/irisowner/irisdata
+      IRIS_PASSWORD: ${IRIS_PASSWORD:?Set IRIS_PASSWORD to a local non-default password}
+      AGENTIC_MODE: ${AGENTIC_MODE:-fixture}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    volumes:
+      - agentic-iris-data:/home/irisowner/irisdata
+    healthcheck:
+      test: ['CMD-SHELL', 'iris qlist IRIS 2>/dev/null | grep -q ''\^running,''']
+      interval: 5s
+      timeout: 10s
+      retries: 24
+      start_period: 30s
+volumes:
+  agentic-iris-data:

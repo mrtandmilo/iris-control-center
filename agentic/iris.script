@@ -1,0 +1,8 @@
+zn "USER"
+set sc=$System.OBJ.LoadDir("/home/irisowner/dev/agentic/src","ck",,1)
+if 'sc write $System.Status.GetErrorText(sc),! halt 1
+set sc=##class(IRISControlCenter.Agentic.Installer).Setup()
+if 'sc write $System.Status.GetErrorText(sc),! halt 1
+set sc=##class(%EnsembleMgr).SetAutoStart("USER","IRISControlCenter.Agentic.Production")
+if 'sc write $System.Status.GetErrorText(sc),! halt 1
+halt
