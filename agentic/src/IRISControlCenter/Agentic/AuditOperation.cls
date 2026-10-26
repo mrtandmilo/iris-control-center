@@ -4,7 +4,7 @@ Class IRISControlCenter.Agentic.AuditOperation Extends Ens.BusinessOperation
 Parameter ADAPTER = "Ens.OutboundAdapter";
 Parameter INVOCATION = "Queue";
 
-Method Record(pRequest As IRISControlCenter.Agentic.IncidentResponse, Output pResponse As IRISControlCenter.Agentic.IncidentResponse) As %Status
+Method Record(pRequest As IRISControlCenter.Agentic.AuditRequest, Output pResponse As IRISControlCenter.Agentic.AuditAck) As %Status
 {
     Set id = $Increment(^ICCAgenticAuditSeq)
     Set entry = {
@@ -18,7 +18,7 @@ Method Record(pRequest As IRISControlCenter.Agentic.IncidentResponse, Output pRe
         "source":(pRequest.Source)
     }
     Set ^ICCAgenticAudit(id) = entry.%ToJSON()
-    Set pResponse = ##class(IRISControlCenter.Agentic.IncidentResponse).%New()
+    Set pResponse = ##class(IRISControlCenter.Agentic.AuditAck).%New()
     Set pResponse.AuditId = id
     Quit $$$OK
 }
@@ -26,7 +26,7 @@ Method Record(pRequest As IRISControlCenter.Agentic.IncidentResponse, Output pRe
 XData MessageMap
 {
 <MapItems>
-  <MapItem MessageType="IRISControlCenter.Agentic.IncidentResponse">
+  <MapItem MessageType="IRISControlCenter.Agentic.AuditRequest">
     <Method>Record</Method>
   </MapItem>
 </MapItems>

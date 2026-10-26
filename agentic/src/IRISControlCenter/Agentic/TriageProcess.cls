@@ -14,8 +14,15 @@ Method OnRequest(pRequest As IRISControlCenter.Agentic.IncidentRequest, Output p
     Set pResponse.Source = safe.source
     Set pResponse.ApprovalRequired = 1
 
+    Set audit = ##class(IRISControlCenter.Agentic.AuditRequest).%New()
+    Set audit.IncidentId = pResponse.IncidentId
+    Set audit.Decision = pResponse.Decision
+    Set audit.Route = pResponse.Route
+    Set audit.Reason = pResponse.Reason
+    Set audit.Confidence = pResponse.Confidence
+    Set audit.Source = pResponse.Source
     // No side effects other than the audit ledger; NEVER retry or quarantine here.
-    Set sc = ..SendRequestSync("IncidentLedger",pResponse,.ledgerResponse)
+    Set sc = ..SendRequestSync("IncidentLedger",audit,.ledgerResponse)
     If $$$ISERR(sc) Quit sc
     If '$IsObject(ledgerResponse) Quit $$$ERROR($$$GeneralError,"Ledger did not return a response")
     Set pResponse.AuditId = ledgerResponse.AuditId
