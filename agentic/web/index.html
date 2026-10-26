@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>IRIS Control Center | Agentic Incident Triage</title>
+  <link rel="stylesheet" href="./app.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand">IRIS <span>CONTROL CENTER</span></div>
+    <div class="eyebrow">AGENTIC INTEROPERABILITY EDITION</div>
+    <h1>Incident triage, with an accountable decision trail.</h1>
+    <p class="lead">A real IRIS Production routes each synthetic incident through AI Hub decision-making, deterministic safety policy, and an audit operation.</p>
+    <div class="badges"><span id="mode" class="badge">Checking mode…</span><span class="badge safe">Human approval required</span></div>
+  </header>
+  <main>
+    <section class="panel">
+      <div class="section-heading"><h2>1. Run a synthetic incident</h2><p>Nothing is retried or quarantined automatically.</p></div>
+      <div class="samples">
+        <button type="button" data-case="transient"><strong>Transient outage</strong><span>HTTP 503 · no retries</span></button>
+        <button type="button" data-case="integrity"><strong>Integrity conflict</strong><span>DATA_INTEGRITY · high risk</span></button>
+        <button type="button" data-case="limit"><strong>Retry exhausted</strong><span>TIMEOUT · 3 retries</span></button>
+      </div>
+      <button type="button" id="run-all" class="primary">Run all three scenarios</button>
+      <div id="status" role="status" aria-live="polite">Ready.</div>
+      <pre id="result" aria-label="Latest incident result">No incident submitted yet.</pre>
+    </section>
+    <section class="panel">
+      <div class="section-heading"><h2>2. Review the decision trail</h2><p>Approve or reject a recommendation; approvals are recorded but never execute remediation.</p></div>
+      <button type="button" id="refresh" class="secondary">Refresh audit</button>
+      <div id="audit" class="audit" aria-live="polite"></div>
+    </section>
+  </main>
+  <footer>Demonstration with synthetic data only · Build 154 required · No automatic remediation</footer>
+</body>
+</html>

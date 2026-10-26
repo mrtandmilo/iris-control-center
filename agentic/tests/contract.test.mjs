@@ -64,3 +64,16 @@ test('human review is authenticated, one-time, and never executes remediation', 
   assert.match(review, /reviewed_by/);
   assert.doesNotMatch(review, /SendRequestSync|SendRequestAsync|HttpRequest/);
 });
+
+test('dashboard serves only local assets and uses safe DOM rendering', () => {
+  const ui = read('../src/IRISControlCenter/Agentic/UI.cls');
+  const js = read('../web/app.js');
+  const html = read('../web/index.html');
+  assert.match(ui, /Extends %CSP\.REST/);
+  assert.match(ui, /agentic\/web/);
+  assert.match(js, /textContent/);
+  assert.match(js, /replaceChildren\(\)/);
+  assert.doesNotMatch(js, /innerHTML|document\.write\(/);
+  assert.match(html, /Agentic Incident Triage/);
+  assert.match(installer, /agentic-ui/);
+});

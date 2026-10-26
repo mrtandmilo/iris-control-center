@@ -4,6 +4,7 @@ FROM ${IMAGE}
 
 WORKDIR /home/irisowner/dev
 COPY agentic/src ./agentic/src
+COPY agentic/web ./agentic/web
 COPY agentic/iris.script ./agentic/iris.script
 COPY scripts/container-entrypoint.sh ./scripts/container-entrypoint.sh
 

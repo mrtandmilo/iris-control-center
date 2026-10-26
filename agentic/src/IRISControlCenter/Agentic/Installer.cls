@@ -19,6 +19,23 @@ ClassMethod Setup() As %Status
         Set app.MatchRoles = ""
         Set app.AutheEnabled = 32
         Set sc = app.%Save()
+        If $$ISERR(sc) $$ThrowStatus(sc)
+
+        Set ui = ##class(Security.Applications).%OpenId("/iris-control-center/agentic-ui")
+        If '$IsObject(ui) {
+            Set ui = ##class(Security.Applications).%New()
+            Set ui.Name = "/iris-control-center/agentic-ui"
+        }
+        Set ui.Description = "IRIS Control Center Agentic Judge Dashboard"
+        Set ui.NameSpace = namespace
+        Set ui.Enabled = 1
+        Set ui.Path = "/home/irisowner/dev/agentic/web"
+        Set ui.DispatchClass = "IRISControlCenter.Agentic.UI"
+        Set ui.ServeFiles = 0
+        Set ui.Recurse = 1
+        Set ui.MatchRoles = ""
+        Set ui.AutheEnabled = 32
+        Set sc = ui.%Save()
     } Catch ex {
         Set sc = ex.AsStatus()
     }
