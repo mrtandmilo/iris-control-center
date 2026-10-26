@@ -10,6 +10,7 @@ const process = read('../src/IRISControlCenter/Agentic/TriageProcess.cls');
 const operation = read('../src/IRISControlCenter/Agentic/AuditOperation.cls');
 const service = read('../src/IRISControlCenter/Agentic/IncidentService.cls');
 const rest = read('../src/IRISControlCenter/Agentic/REST.cls');
+const review = read('../src/IRISControlCenter/Agentic/Review.cls');
 const installer = read('../src/IRISControlCenter/Agentic/Installer.cls');
 const dockerfile = read('../Dockerfile');
 const compose = read('../docker-compose.yml');
@@ -53,4 +54,13 @@ test('Docker uses required EAP build 154 and no default password', () => {
   assert.match(compose, /2026\.3\.0AI\.154\.0/);
   assert.match(compose, /IRIS_PASSWORD:\s*\$\{IRIS_PASSWORD:\?/);
   assert.doesNotMatch(compose, /docker push|registry\.example/);
+});
+
+test('human review is authenticated, one-time, and never executes remediation', () => {
+  assert.match(rest, /Method="POST" Call="Review"/);
+  assert.match(rest, /ClassMethod Review\(\)/);
+  assert.match(review, /Lock \+\^ICCAgenticReview/);
+  assert.match(review, /already_reviewed/);
+  assert.match(review, /reviewed_by/);
+  assert.doesNotMatch(review, /SendRequestSync|SendRequestAsync|HttpRequest/);
 });

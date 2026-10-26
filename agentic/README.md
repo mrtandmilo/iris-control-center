@@ -80,6 +80,18 @@ The live path invokes `%AI.Agent.%Init()`, `CreateSession()` and `Chat()`. Agent
 
 Security boundaries: no permissive CORS, authenticated REST application, bounded input fields, no raw provider exceptions in API responses, and no sensitive incident summaries or credentials in the audit ledger. **Use synthetic data only.**
 
+## Human approval workflow
+
+After the agent's decision has been recorded, an authenticated operator can review it without executing any remediation:
+
+```bash
+curl -u "_SYSTEM:${IRIS_PASSWORD}" -H 'Content-Type: application/json' \
+  -d '{"audit_id":1,"action":"approve"}' \
+  http://localhost:52773/iris-control-center/agentic/review
+```
+
+Use `"reject"` instead to decline. A second review returns HTTP 409. Review events are stored separately in `^ICCAgenticReview` so the original decision remains unchanged; `GET /audit` includes the review when present. **Approval is an auditable acknowledgement, not authorisation to execute a production change.**
+
 ## Tests and evidence
 
 ```bash

@@ -9,6 +9,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
   <Route Url="/health" Method="GET" Call="Health" />
   <Route Url="/incident" Method="POST" Call="Incident" />
   <Route Url="/audit" Method="GET" Call="Audit" />
+  <Route Url="/review" Method="POST" Call="Review" />
 </Routes>
 }
 
@@ -75,6 +76,29 @@ ClassMethod Incident() As %Status
         Write {"error":"invalid_json_or_incident"}.%ToJSON()
     }
     Quit $$$OK
+}
+
+/// Only an authenticated operator can approve/reject a recommendation.
+ClassMethod Review() As %Status
+{
+    Set %response.ContentType = "application/json"
+    Try {
+        Set input = ##class(%DynamicObject).%FromJSON(%request.Content.Read(2048))
+        Set id = +input.%Get("audit_id",0)
+        Set action = input.%Get("action","")
+        Set outcome = ##class(IRISControlCenter.Agentic.Review).Decide(id,action)
+        Set error = outcome.%Get("error","")
+        If error="invalid_action" Set %response.Status = "400 Bad Request"
+        If error="invalid_audit_id" Set %response.Status = "400 Bad Request"
+        If error="audit_not_found" Set %response.Status = "404 Not Found"
+        If error="already_reviewed" Set %response.Status = "409 Conflict"
+        If error="review_busy" Set %response.Status = "503 Service Unavailable"
+        Write outcome.%ToJSON()
+    } Catch ex {
+        Set %response.Status = "400 Bad Request"
+        Write {"error":"invalid_review_request"}.%ToJSON()
+    }
+    Quit $$OK
 }
 
 ClassMethod Audit() As %Status

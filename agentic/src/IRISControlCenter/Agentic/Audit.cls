@@ -11,6 +11,9 @@ ClassMethod Tail(pLimit As %Integer = 10) As %DynamicArray
         If '$Data(^ICCAgenticAudit(n)) Continue
         Try {
             Set entry = ##class(%DynamicObject).%FromJSON(^ICCAgenticAudit(n))
+            If $Data(^ICCAgenticReview(n)) {
+                Set entry.review = ##class(%DynamicObject).%FromJSON(^ICCAgenticReview(n))
+            }
             Do results.%Push(entry)
         } Catch ex {
             // Skip corrupt records; never emit raw global contents.
