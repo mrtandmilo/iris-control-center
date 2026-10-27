@@ -77,3 +77,17 @@ test('dashboard serves only local assets and uses safe DOM rendering', () => {
   assert.match(html, /Agentic Incident Triage/);
   assert.match(installer, /agentic-ui/);
 });
+
+
+test('ObjectScript status macros and TRY/CATCH exits use valid syntax', () => {
+  // Bare $$OK/$$ISERR are routine calls, not the required status macros.
+  for (const [name, source] of [['REST', rest], ['Installer', installer], ['DecisionAgent', agent]]) {
+    assert.doesNotMatch(source, /(?<!\$)\$\$(?:OK|ISERR|ThrowStatus)\b/, name);
+  }
+  assert.match(rest, /Return \$\$\$OK/);
+  assert.match(rest, /Quit \$\$\$OK/);
+  assert.match(installer, /If \$\$\$ISERR\(sc\) \$\$\$ThrowStatus\(sc\)/);
+  assert.match(agent, /If \$\$\$ISERR\(sc\) Return fallback/);
+  assert.match(agent, /Return parsed/);
+  assert.match(agent, /Catch ex \{\s*\/\/ Never expose[\s\S]*?Return fallback/);
+});
