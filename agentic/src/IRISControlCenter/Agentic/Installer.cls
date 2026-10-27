@@ -19,7 +19,7 @@ ClassMethod Setup() As %Status
         Set app.MatchRoles = ""
         Set app.AutheEnabled = 32
         Set sc = app.%Save()
-        If $$ISERR(sc) $$ThrowStatus(sc)
+        If $$$ISERR(sc) $$$ThrowStatus(sc)
 
         Set ui = ##class(Security.Applications).%OpenId("/iris-control-center/agentic-ui")
         If '$IsObject(ui) {
