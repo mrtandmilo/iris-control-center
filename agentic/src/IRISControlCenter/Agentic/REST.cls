@@ -35,12 +35,12 @@ ClassMethod Incident() As %Status
         If (incidentId="")!(sourceSystem="")!(errorCode="") {
             Set %response.Status = "400 Bad Request"
             Write {"error":"incident_id_source_system_error_code_required"}.%ToJSON()
-            Quit $$$OK
+            Return $$OK
         }
         If ($Length(incidentId)>80)!($Length(sourceSystem)>80)!($Length(errorCode)>40)!($Length(summary)>600)!(retryCount<0)!(retryCount>10) {
             Set %response.Status = "400 Bad Request"
             Write {"error":"invalid_incident_fields"}.%ToJSON()
-            Quit $$$OK
+            Return $$OK
         }
         Set request = ##class(IRISControlCenter.Agentic.IncidentRequest).%New()
         Set request.IncidentId = incidentId
@@ -52,13 +52,13 @@ ClassMethod Incident() As %Status
         If $$$ISERR(sc) {
             Set %response.Status = "503 Service Unavailable"
             Write {"error":"production_not_running"}.%ToJSON()
-            Quit $$$OK
+            Return $$OK
         }
         Set sc = service.ProcessInput(request,.answer)
         If $$$ISERR(sc) {
             Set %response.Status = "503 Service Unavailable"
             Write {"error":"triage_failed"}.%ToJSON()
-            Quit $$$OK
+            Return $$OK
         }
         Set body = {
             "incident_id":(answer.IncidentId),
