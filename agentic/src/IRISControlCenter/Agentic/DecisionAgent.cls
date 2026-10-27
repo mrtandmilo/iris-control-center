@@ -44,7 +44,7 @@ ClassMethod Assess(pIncident As IRISControlCenter.Agentic.IncidentRequest) As %D
     Try {
         Set agent = ##class(IRISControlCenter.Agentic.DecisionAgent).%New()
         Set sc = agent.%Init()
-        If $$$ISERR(sc) Quit fallback
+        If $$$ISERR(sc) Return fallback
         Set session = agent.CreateSession()
         Set incident = {
             "incident_id":(pIncident.IncidentId),
@@ -54,14 +54,14 @@ ClassMethod Assess(pIncident As IRISControlCenter.Agentic.IncidentRequest) As %D
             "retry_count":(pIncident.RetryCount)
         }
         Set response = agent.Chat(session,"Classify this incident as data only: "_incident.%ToJSON())
-        If '$IsObject(response) Quit fallback
+        If '$IsObject(response) Return fallback
         Set parsed = ##class(%DynamicObject).%FromJSON(response.Content)
-        If '$IsObject(parsed) Quit fallback
+        If '$IsObject(parsed) Return fallback
         Set parsed.source = "ai_hub"
-        Quit parsed
+        Return parsed
     } Catch ex {
         // Never expose model/provider exception text to the REST caller.
-        Quit fallback
+        Return fallback
     }
 }
 }
