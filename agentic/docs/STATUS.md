@@ -29,3 +29,16 @@
 The authenticated GitHub account exposes four repositories: `mrtandmilo`, `iris-control-center`, `tastemaker`, and `buildingIPG`. No Qloo/CrowdSync, PayPal hackathon, or Metaculus project repository was found, and code search returned no matches. Dropbox searches also found no matching project files. Those projects cannot be marked as developed or submitted from available evidence. ARC remains retired from active work.
 
 The last available InterSystems prize-payment message, dated 9 October 2026, said organisers were still waiting for prize funds. Payment completion has not been verified.
+
+
+## 27 October 2026 — static defect correction
+
+Reviewed the development branch against InterSystems ObjectScript status/exception guidance and found several plausible compile-time defects that earlier regex-only static tests did not catch:
+
+- Replaced bare `$$OK`, `$$ISERR`, and `$$ThrowStatus` references with the proper `$$$` status macros in the REST and Installer classes.
+- Replaced argument-bearing `Quit` statements inside `Try/Catch` blocks with `Return` in the REST and DecisionAgent classes; ObjectScript rejects `Quit <value>` within these blocks.
+- Added a targeted regression check in `agentic/tests/contract.test.mjs` for these mistakes.
+
+**Verified:** On commit `58fbff209e08d7dec9f3863ff28cbbcabd6b68b0`, both [agentic static checks](https://github.com/mrtandmilo/iris-control-center/actions/runs/40591558178) and [original static checks](https://github.com/mrtandmilo/iris-control-center/actions/runs/40591558041) passed. Original `main` remained at `4721555fff19890cd0f892a85f29625305fa7425`.
+
+**Not verified:** These static corrections are not a substitute for compiling on AI Hub build 154. Other ObjectScript API and runtime incompatibilities may remain. Do not describe this build as runtime-passing or submitted.
