@@ -65,7 +65,7 @@ The demo sends a temporary HTTP 503, a measurement-data integrity incident, and 
 
 ## Judge dashboard
 
-After the container is healthy, open `http://localhost:52773/iris-control-center/agentic-ui/` and authenticate using `_SYSTEM` and the local `IRIS_PASSWORD`. The dashboard provides three synthetic scenarios, live/fixture source labels, an audit timeline, and explicit approve/reject buttons. It is served by IRIS from the same origin as the authenticated API. It is **not** an online deployment.
+The Compose configuration binds port 52773 to `127.0.0.1` only, so the demonstration API is not exposed to the LAN by default. After the container is healthy, open `http://localhost:52773/iris-control-center/agentic-ui/` and authenticate using `_SYSTEM` and the local `IRIS_PASSWORD`. The dashboard provides three synthetic scenarios, live/fixture source labels, an audit timeline, and explicit approve/reject buttons. It is served by IRIS from the same origin as the authenticated API. It is **not** an online deployment.
 
 ## Actual message path
 
