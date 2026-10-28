@@ -49,3 +49,10 @@ Reviewed the development branch against InterSystems ObjectScript status/excepti
 - Documented its invocation and evidence gate in `agentic/tests/TEST_PLAN.md`.
 - **Verified:** Both GitHub Actions static workflows passed on commit `4296c3415ddd7ee4b974c607dae74fec47b99fac`: [agentic static](https://github.com/mrtandmilo/iris-control-center/actions/runs/40777575715), [original static](https://github.com/mrtandmilo/iris-control-center/actions/runs/40777575928).
 - **Not verified:** The harness has not been executed against IRIS AI Hub Community build 154. There is no ObjectScript runtime PASS, live AI Hub inference, demo recording or official submission. The original `main` release remains unchanged at `4721555fff19890cd0f892a85f29625305fa7425`.
+
+## 28 October — security hardening
+
+- Restricted `agentic/docker-compose.yml` port publishing to `127.0.0.1:52773:52773` instead of all host interfaces. This removes inadvertent LAN exposure of the authenticated synthetic demo.
+- Added a static regression test enforcing the loopback binding, and CI syntax-checks the new HTTP acceptance harness.
+- **Verified:** Both GitHub Actions workflows passed on commit `7369f0794678cbfae014ae53899d40c2590770a0` ([agentic static](https://github.com/mrtandmilo/iris-control-center/actions/runs/40777946254), [original static](https://github.com/mrtandmilo/iris-control-center/actions/runs/40777946318)). A subsequent README clarification is documentation only; final HEAD checks should be inspected separately.
+- **Still unverified:** EAP build-154 ObjectScript compilation and HTTP runtime tests. The loopback binding change has not been tested against a running Docker container. No paid model calls or official submission.
