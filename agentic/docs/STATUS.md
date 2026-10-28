@@ -42,3 +42,10 @@ Reviewed the development branch against InterSystems ObjectScript status/excepti
 **Verified:** On commit `58fbff209e08d7dec9f3863ff28cbbcabd6b68b0`, both [agentic static checks](https://github.com/mrtandmilo/iris-control-center/actions/runs/40591558178) and [original static checks](https://github.com/mrtandmilo/iris-control-center/actions/runs/40591558041) passed. Original `main` remained at `4721555fff19890cd0f892a85f29625305fa7425`.
 
 **Not verified:** These static corrections are not a substitute for compiling on AI Hub build 154. Other ObjectScript API and runtime incompatibilities may remain. Do not describe this build as runtime-passing or submitted.
+
+## 28 October 2026 — runtime acceptance harness added
+
+- Added `agentic/tests/runtime-http-check.mjs`, a loopback-only, fixture-mode HTTP acceptance harness covering authentication rejection, invalid request handling without audit mutation, four incident routes, monotonically increasing audit IDs and one-time human review.
+- Documented its invocation and evidence gate in `agentic/tests/TEST_PLAN.md`.
+- **Verified:** Both GitHub Actions static workflows passed on commit `4296c3415ddd7ee4b974c607dae74fec47b99fac`: [agentic static](https://github.com/mrtandmilo/iris-control-center/actions/runs/40777575715), [original static](https://github.com/mrtandmilo/iris-control-center/actions/runs/40777575928).
+- **Not verified:** The harness has not been executed against IRIS AI Hub Community build 154. There is no ObjectScript runtime PASS, live AI Hub inference, demo recording or official submission. The original `main` release remains unchanged at `4721555fff19890cd0f892a85f29625305fa7425`.
