@@ -94,6 +94,6 @@ test('ObjectScript status macros and TRY/CATCH exits use valid syntax', () => {
 
 
 test('fixture dashboard port is bound to loopback, not exposed to LAN', () => {
-  assert.match(compose, /127\\.0\\.0\\.1:52773:52773/);
-  assert.doesNotMatch(compose, /-\\s*["']52773:52773["']/);
+  assert.match(compose, /127\.0\.0\.1:52773:52773/);
+  assert.doesNotMatch(compose, /-\s*["']52773:52773["']/);
 });
