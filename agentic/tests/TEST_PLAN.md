@@ -13,3 +13,13 @@ Use only the InterSystems IRIS AI Hub Community EAP build **154**. Run from a cl
 9. Record commit SHA, image ID, terminal output, endpoint responses, and a narrated 90–180 second demo.
 
 Static CI success does not satisfy any of these runtime gates. Do not claim contest readiness until steps 1–8 pass.
+
+## Automated local HTTP acceptance (added 28 October)
+
+After build-154 has compiled, the Production is healthy, and `AGENTIC_MODE=fixture` is confirmed, run:
+
+```bash
+IRIS_PASSWORD="<local-non-default-password>" node agentic/tests/runtime-http-check.mjs
+```
+
+This loopback-only harness tests unauthenticated denial, authenticated fixture health, invalid incident rejection without audit mutation, four Production-routed decisions, monotonic audit IDs, and one-time review persistence. It refuses live AI mode and remote hosts. It has passed a local JavaScript syntax check, **not an IRIS runtime execution**. Do not include secrets in test logs. Use the same commit and EAP image ID for evidence.
