@@ -13,6 +13,7 @@ jobs:
       - name: Validate agentic source contracts (not IRIS runtime)
         run: |
           node --check agentic/web/app.js
+          node --check agentic/tests/runtime-http-check.mjs
           node --test agentic/tests/contract.test.mjs
       - name: Validate agentic Compose syntax without downloading EAP images
         run: |
