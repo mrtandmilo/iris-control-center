@@ -106,6 +106,22 @@ These are **static wiring/contract tests only**. They do not compile ObjectScrip
 
 **Not yet verified:** ObjectScript compilation on build 154, Production auto-start, message dispatch, live LLM response parsing, audit persistence, REST authentication, and the three-case end-to-end demo. There is no video, deployed demo, Open Exchange listing or submission receipt.
 
+### Zero-cost local preflight
+
+Before attempting the first fixture-mode runtime build, set a non-default local
+`IRIS_PASSWORD` and run:
+
+```bash
+AGENTIC_MODE=fixture bash agentic/tests/preflight-fixture.sh
+```
+
+The preflight checks Docker Compose, the **locally loaded authorised build-154
+image**, Compose syntax and static contracts. It refuses live mode and does not
+start a container, call an LLM, accept terms, or submit an entry. A passing
+preflight is **not** evidence of ObjectScript compilation or live inference.
+The negative-path safety checks are run by
+`node --test agentic/tests/preflight.test.mjs`.
+
 ## Required next gates
 
 1. Obtain the EAP build-154 image through authorised access.
